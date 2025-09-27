@@ -1,14 +1,9 @@
-﻿
-@page "/"
+﻿@page "/"
 @layout LandingLayout
 @inject IJSRuntime JS
-
-
-
 @rendermode InteractiveServer
 @inject NavigationManager NavigationManager
 @inject HomeTechBlazor.Components.Shared.CurrentUser CurrentUser
-
 
 <Toast @ref="toastComponent" />
 
@@ -22,7 +17,7 @@
 }
 else
 {
-    <a href="/register" >Đăng ký</a>
+    <a href="/register">Đăng ký</a>
     <a href="/login">Đăng nhập</a>
 }
 <div class="page-wrapper">
@@ -172,12 +167,19 @@ else
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender && !string.IsNullOrEmpty(errorMessage))
+        if (firstRender)
         {
-            toastComponent.ShowError(errorMessage);
-            errorMessage = null; // clear sau khi hiển thị
+            if (!string.IsNullOrEmpty(errorMessage))
+            {
+                toastComponent.ShowError(errorMessage);
+                errorMessage = null;
+            }
+
+            // 👉 GỌI INIT SLIDER
+            await JS.InvokeVoidAsync("landingPage.init");
         }
     }
+
     private void SignOut()
     {
         CurrentUser.name = string.Empty;
@@ -187,13 +189,4 @@ else
         CurrentUser.address = string.Empty;
         NavigationManager.NavigateTo("/");
     }
-    //     protected override async Task OnAfterRenderAsync(bool firstRender)
-    // {
-    //     if (firstRender)
-    //     {
-    //         await JS.InvokeVoidAsync("landingPage.init");
-    //     }
-    // }
 }
-
-
