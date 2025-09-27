@@ -1,41 +1,57 @@
 ﻿window.landingPage = {
     init: function () {
-        const slideTrack = document.getElementById("slideTrack");
-        const slides = document.querySelectorAll(".slide");
+        console.log("LandingPage JS loaded ✅");
+
+        const track = document.getElementById("slideTrack");
+        const slides = track ? track.children : [];
         const prevBtn = document.getElementById("prevBtn");
         const nextBtn = document.getElementById("nextBtn");
+        const pagination = document.getElementById("pagination");
+        let index = 0;
 
-        let currentIndex = 0;
-        const slideCount = slides.length;
-
-        // Hàm hiển thị slide theo index
-        function showSlide(index) {
-            const slideWidth = slides[0].clientWidth;
-            slideTrack.style.transform = `translateX(-${index * slideWidth}px)`;
+        // tạo pagination dots
+        if (pagination && slides.length > 0) {
+            pagination.innerHTML = "";
+            for (let i = 0; i < slides.length; i++) {
+                const dot = document.createElement("span");
+                dot.addEventListener("click", () => showSlide(i));
+                pagination.appendChild(dot);
+            }
         }
 
-        // Nút prev
-        if (prevBtn) {
-            prevBtn.addEventListener("click", () => {
-                currentIndex = (currentIndex - 1 + slideCount) % slideCount;
-                showSlide(currentIndex);
+        function updatePagination() {
+            if (!pagination) return;
+            [...pagination.children].forEach((dot, i) => {
+                dot.classList.toggle("active", i === index);
             });
         }
 
-        // Nút next
-        if (nextBtn) {
-            nextBtn.addEventListener("click", () => {
-                currentIndex = (currentIndex + 1) % slideCount;
-                showSlide(currentIndex);
-            });
+        function showSlide(i) {
+            if (!track || slides.length === 0) return;
+
+            if (i < 0) index = slides.length - 1;
+            else if (i >= slides.length) index = 0;
+            else index = i;
+
+            track.style.transform = `translateX(-${index * 100}%)`;
+            updatePagination();
         }
 
-        // Auto scroll sau 5 giây
-        setInterval(() => {
-            currentIndex = (currentIndex + 1) % slideCount;
-            showSlide(currentIndex);
-        }, 5000);
+        if (prevBtn && nextBtn) {
+            prevBtn.addEventListener("click", () => showSlide(index - 1));
+            nextBtn.addEventListener("click", () => showSlide(index + 1));
+        }
 
-        console.log("LandingPage carousel initialized");
+        // auto slide
+        if (slides.length > 0) {
+            setInterval(() => {
+                showSlide(index + 1);
+            }, 5000); // 5s
+        }
+
+        // hiển thị slide đầu tiên
+        showSlide(0);
+
+        console.log("LandingPage init finished 🚀");
     }
 };
