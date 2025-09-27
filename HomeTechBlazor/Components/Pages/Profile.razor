@@ -1,0 +1,46 @@
+﻿@page "/profile"
+@inject CurrentUser currentUser
+@layout LandingLayout
+@rendermode InteractiveServer
+
+<h3>Profile</h3>
+
+<EditForm Model="@userModel" FormName="form_users">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <label>Tên người dùng</label>
+    <InputText @bind-Value="userModel.Name" class="form-control" />
+    <ValidationMessage For="@(() => userModel.Name)" />
+
+    <label>SĐT</label>
+    <InputText @bind-Value="userModel.Phone" class="form-control" />
+    <ValidationMessage For="@(() => userModel.Phone)" />
+
+    <label>Mật khẩu</label>
+    <InputText @bind-Value="userModel.Password" class="form-control" type="password" />
+    <ValidationMessage For="@(() => userModel.Password)" />
+
+    <label>Địa chỉ</label>
+    <InputTextArea @bind-Value="userModel.Address" class="form-control" />
+    <ValidationMessage For="@(() => userModel.Address)" />
+     <InputText class="form-control" @bind-Value="userModel.Role" disabled />
+    <button type="submit" class="btn btn-primary"> Thay đổi</button>
+</EditForm>
+
+@code {
+    string role = "";
+    private HomeTechBlazor.Model.Users userModel = new();
+
+    protected override void OnInitialized()
+    {
+        userModel.Name = currentUser.name;
+        userModel.Phone = currentUser.phone;
+        userModel.Password = currentUser.password;
+        userModel.Address = currentUser.address;
+        userModel.Role = currentUser.role;
+
+    }
+    
+
+}
