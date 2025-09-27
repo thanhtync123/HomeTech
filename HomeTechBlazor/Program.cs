@@ -1,26 +1,30 @@
 ﻿using HomeTechBlazor.Components;
 using HomeTechBlazor.Components.Shared;
 using HomeTechBlazor.Service;
-using MudBlazor;
 using MudBlazor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// === SERVICES ===
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
-// Đăng ký Service
-builder.Services.AddScoped <LoginService>();
+builder.Services.AddScoped<LoginService>();
 builder.Services.AddScoped<ServiceService>();
 builder.Services.AddScoped<OrderService>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddSingleton<CurrentUser>();
 builder.Services.AddMudServices();
 
+// Cho phép tải file lớn
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.Limits.MaxRequestBodySize = null;
+});
+
 var app = builder.Build();
-//----
-// Configure the HTTP request pipeline.
+
+// === PIPELINE ===
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error", createScopeForErrors: true);
@@ -29,11 +33,15 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+// ⚠️ Quan trọng: phải gọi UseStaticFiles TRƯỚC antiforgery và map razor
+app.UseStaticFiles(); // <-- Phục vụ video, js, css, ảnh, v.v.
 
+// Nếu bạn có routing, có thể thêm: app.UseRouting();
 app.UseAntiforgery();
 
-app.MapStaticAssets();
+// ⚙️ Map Razor Components
 app.MapRazorComponents<App>()
-    .AddInteractiveServerRenderMode();
+   .AddInteractiveServerRenderMode();
 
+// Không cần app.Map("/videos/..."), Kestrel tự xử lý
 app.Run();
