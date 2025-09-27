@@ -1,8 +1,139 @@
-﻿@page "/"
+﻿
+@page "/"
 @layout LandingLayout
-@rendermode InteractiveServer
+@inject IJSRuntime JS
 
-đây là layout <br />
-<a href="/home">Trang quản trị</a>
-<a href="/register">Đăng ký</a>
-<!-- Nội dung trang landing -->
+@code {
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JS.InvokeVoidAsync("landingPage.init");
+        }
+    }
+}
+
+<div class="page-wrapper">
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="container flex justify-between">
+            <h1 class="logo">HomeTech</h1>
+            <div class="nav-links">
+                <a href="#home">Trang Chủ</a>
+                <a href="#services">Dịch Vụ</a>
+                <a href="#about">Về Chúng Tôi</a>
+                <a href="#contact">Liên Hệ</a>
+                <a href="/register" class="btn-primary">Bắt Đầu với chúng tôi!</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <section id="home" class="hero-bg hero">
+        <div class="hero-content">
+            <h1>HomeTech – Giải Pháp Sửa Chữa & Dịch Vụ Toàn Diện</h1>
+            <p>
+                Từ ngôi nhà đến văn phòng, từ điện, nước, điện lạnh đến vệ sinh –
+                HomeTech mang đến dịch vụ nhanh chóng, uy tín và chuyên nghiệp
+                cho mọi nhu cầu của bạn.
+            </p>
+            <div class="hero-actions">
+                <a href="/book" class="btn-primary">Đặt Ngay</a>
+                <a href="#about" class="btn-secondary">Tìm Hiểu Thêm</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services -->
+    <section id="services" class="section">
+        <h2 class="section-title">Các Dịch Vụ HomeTech</h2>
+        <div class="slider-container">
+            <div class="slider">
+                <div class="slide-track" id="slideTrack">
+                    <div class="slide">
+                        <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&h=400&q=80" alt="AC Repair">
+                        <h3>AC Repair</h3>
+                        <p>Expert cooling system repairs for ultimate comfort.</p>
+                    </div>
+                    <div class="slide">
+                        <img src="https://images.unsplash.com/photo-1604014231950-8a026bf637d0?auto=format&fit=crop&w=800&h=400&q=80" alt="Plumbing Solutions">
+                        <h3>Plumbing Solutions</h3>
+                        <p>Swift fixes for leaks, clogs, and installations.</p>
+                    </div>
+                    <div class="slide">
+                        <img src="https://images.unsplash.com/photo-1600585154526-990d8e49f3b2?auto=format&fit=crop&w=800&h=400&q=80" alt="Electrical Services">
+                        <h3>Electrical Services</h3>
+                        <p>Safe, reliable wiring and electrical repairs.</p>
+                    </div>
+                    <div class="slide">
+                        <img src="https://images.unsplash.com/photo-1575011607337-56f359b95099?auto=format&fit=crop&w=800&h=400&q=80" alt="Home Cleaning">
+                        <h3>Home Cleaning</h3>
+                        <p>Professional cleaning for a spotless home.</p>
+                    </div>
+                </div>
+            </div>
+            <button class="control-btn" id="prevBtn">❮</button>
+            <button class="control-btn" id="nextBtn">❯</button>
+            <div class="pagination" id="pagination"></div>
+        </div>
+    </section>
+
+    <!-- About -->
+    <section id="about" class="section light">
+        <h2 class="section-title">Về HomeTech</h2>
+        <div class="about-container">
+            <img src="images/hometech.jpg" alt="HomeTech logo" />
+            <div>
+                <p>
+                    HomeTech là nền tảng dịch vụ gia đình hiện đại, kết nối khách
+                    hàng với đội ngũ kỹ thuật viên uy tín và chuyên nghiệp.
+                </p>
+                <p>
+                    Chỉ với vài thao tác đơn giản, bạn có thể dễ dàng đặt lịch sửa
+                    chữa, bảo trì hay vệ sinh nhà cửa ngay tại nhà.
+                </p>
+                <p>
+                    Với HomeTech, chúng tôi mang đến trải nghiệm nhanh chóng,
+                    minh bạch và an toàn – giúp bạn tận hưởng không gian sống tiện
+                    nghi hơn mỗi ngày.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact -->
+    <section id="contact" class="section">
+        <h2 class="section-title">Liên Hệ</h2>
+        <form class="contact-form">
+            <input type="text" placeholder="Tên của bạn" />
+            <input type="email" placeholder="Email của bạn" />
+            <textarea rows="5" placeholder="Gửi về chúng tôi..."></textarea>
+            <button type="submit" class="btn-primary w-full">Send Message</button>
+        </form>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div>
+            <h3>HomeTech</h3>
+            <p>
+                Your trusted partner for professional home services. Book with
+                confidence.
+            </p>
+        </div>
+        <div>
+            <h3>Liên Kết Nhanh</h3>
+            <a href="#services">Services</a> |
+            <a href="#about">About</a> |
+            <a href="#contact">Contact</a>
+        </div>
+        <div>
+            <h3>Thông Tin Liên Hệ</h3>
+            <p>Email: support@hometech.com</p>
+            <p>Phone: +84 123 456 789</p>
+            <p>Address: 123 Tech Street, Hanoi, Vietnam</p>
+        </div>
+        <p class="copy">© 2025 HomeTech. All rights reserved.</p>
+    </footer>
+</div>
