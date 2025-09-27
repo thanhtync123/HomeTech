@@ -139,20 +139,6 @@
         color: #555;
     }
 
-/* About */
-.about-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    justify-content: center;
-    align-items: center;
-}
-
-    .about-container img {
-        max-width: 300px;
-        border-radius: 12px;
-    }
-
 /* Contact */
 .contact-form {
     max-width: 500px;
@@ -202,6 +188,8 @@
     font-size: 0.9rem;
     color: #777;
 }
+
+/* Body & base */
 body {
     background-color: #f3f4f6;
     font-family: 'Poppins', sans-serif;
@@ -219,6 +207,7 @@ body {
     margin-bottom: 3rem;
 }
 
+/* Slider */
 .slider-container {
     position: relative;
     max-width: 900px;
@@ -276,6 +265,7 @@ body {
         margin: 0 auto;
     }
 
+/* Slider buttons */
 .control-btn {
     position: absolute;
     top: 50%;
@@ -332,6 +322,7 @@ body {
             background-color: #64748b;
         }
 
+/* Responsive */
 @media (max-width: 640px) {
     .section-title {
         font-size: 2rem;
@@ -353,3 +344,146 @@ body {
         font-size: 1rem;
     }
 }
+
+/* Buttons */
+.more-btn {
+    display: inline-block;
+    padding: 14px 32px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 50px;
+    background: linear-gradient(135deg, #4f46e5, #3b82f6);
+    box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3);
+    transition: all 0.3s ease;
+    letter-spacing: 0.5px;
+}
+
+    .more-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(79, 70, 229, 0.5);
+        background: linear-gradient(135deg, #3b82f6, #4f46e5);
+    }
+
+    .more-btn:active {
+        transform: scale(0.96);
+        box-shadow: 0 2px 10px rgba(79, 70, 229, 0.4);
+    }
+
+/* ============================= */
+/* ✅ ABOUT SECTION FIXED VERSION */
+/* ============================= */
+
+.section.about {
+    padding: 80px 20px;
+    text-align: left !important;
+}
+
+.about-container {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    flex-wrap: nowrap;
+    gap: 0;
+    opacity: 0;
+    transition: opacity 1s ease;
+}
+
+    .about-container.show {
+        opacity: 1;
+    }
+
+    .about-container img {
+        width: 220px;
+        border-radius: 12px;
+        object-fit: cover;
+        margin-right: 12px;
+        transform: translateX(-100px);
+        opacity: 0;
+        transition: all 1s ease;
+        display: block;
+    }
+
+    .about-container.show img {
+        transform: translateX(0);
+        opacity: 1;
+    }
+
+    .about-container div {
+        flex: 1;
+        transform: translateX(100px);
+        opacity: 0;
+        transition: all 1s ease;
+        text-align: left;
+    }
+
+    .about-container.show div {
+        transform: translateX(0);
+        opacity: 1;
+    }
+
+    .about-container h2,
+    .about-container p {
+        margin: 0;
+        padding: 0;
+    }
+/* ===== PHẦN GIỚI THIỆU TECHFIX ===== */
+.section.about {
+    padding: 80px 20px;
+    background-color: #fafafa;
+    text-align: center; /* Giữ tiêu đề ở giữa */
+}
+
+.about-container {
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Canh giữa toàn bộ */
+    flex-wrap: nowrap;
+    gap: 20px; /* Khoảng cách nhẹ giữa ảnh và chữ */
+    opacity: 0;
+    transition: opacity 1s ease;
+}
+
+    .about-container.show {
+        opacity: 1;
+    }
+
+    .about-container img {
+        width: 220px;
+        border-radius: 12px;
+        object-fit: cover;
+        transform: translateX(-100px);
+        opacity: 0;
+        transition: all 1s ease;
+    }
+
+    .about-container.show img {
+        transform: translateX(0);
+        opacity: 1;
+    }
+
+    .about-container div {
+        max-width: 600px;
+        text-align: left;
+        transform: translateX(100px);
+        opacity: 0;
+        transition: all 1s ease;
+    }
+
+    .about-container.show div {
+        transform: translateX(0);
+        opacity: 1;
+    }
+
+    .about-container h2 {
+        font-size: 2rem;
+        color: #0c0c0c;
+        margin-bottom: 20px;
+    }
+
+    .about-container p {
+        color: #444;
+        line-height: 1.6;
+        font-size: 15px;
+    }

@@ -9,7 +9,7 @@
         const pagination = document.getElementById("pagination");
         let index = 0;
 
-        // tạo pagination dots
+        // ===== SLIDER =====
         if (pagination && slides.length > 0) {
             pagination.innerHTML = "";
             for (let i = 0; i < slides.length; i++) {
@@ -42,15 +42,28 @@
             nextBtn.addEventListener("click", () => showSlide(index + 1));
         }
 
-        // auto slide
         if (slides.length > 0) {
             setInterval(() => {
                 showSlide(index + 1);
-            }, 5000); // 5s
+            }, 5000);
         }
 
-        // hiển thị slide đầu tiên
         showSlide(0);
+
+        // ===== ABOUT SECTION ANIMATION =====
+        const aboutSection = document.querySelector(".about-container");
+
+        function checkScroll() {
+            if (!aboutSection) return;
+            const rect = aboutSection.getBoundingClientRect();
+            if (rect.top < window.innerHeight - 100) {
+                aboutSection.classList.add("show");
+                window.removeEventListener("scroll", checkScroll); // chỉ chạy 1 lần
+            }
+        }
+
+        window.addEventListener("scroll", checkScroll);
+        checkScroll();
 
         console.log("LandingPage init finished 🚀");
     }

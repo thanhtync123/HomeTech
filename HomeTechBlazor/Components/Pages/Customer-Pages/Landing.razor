@@ -13,14 +13,24 @@
 
     <!-- Navbar -->
     <nav class="navbar">
-        <div class="container flex justify-between">
-            <h1 class="logo">TECHFIX</h1>
-            <div class="nav-links">
-                <a href="#home">Trang Chủ</a>             
+        <div class="container flex justify-between items-center">
+            <!-- Logo + Text -->
+            <div class="flex items-center">
+                <img src="images/hometech.jpg" alt="Logo"
+                     style="width:40px; height:40px; object-fit:contain; margin-right:8px;" />
+                <h1 class="logo" style="margin:0; display:inline-block; line-height:40px;">
+                    TECHFIX
+                </h1>
+            </div>
+
+            <!-- Navigation Links -->
+            <div class="nav-links flex items-center space-x-4">
+                <a href="#home">Trang Chủ</a>
                 <a href="#services">Dịch Vụ</a>
                 <a href="#about">Về Chúng Tôi</a>
                 <a href="#contact">Liên Hệ</a>
                 <a href="/home">Trang Quản Trị</a>
+
                 @if (CurrentUser.name != string.Empty)
                 {
                     <p>Xin chào @Name</p>
@@ -36,10 +46,12 @@
         </div>
     </nav>
 
+
+
     <!-- Hero -->
     <section id="home" class="hero-bg hero">
         <div class="hero-content">
-            <h1>HomeTech – Giải Pháp Sửa Chữa & Dịch Vụ Toàn Diện</h1>
+            <h1>TECHFIX – Giải Pháp Sửa Chữa & Dịch Vụ Toàn Diện</h1>
             <p>
                 Từ ngôi nhà đến văn phòng, từ điện, nước, điện lạnh đến vệ sinh –
                 HomeTech mang đến dịch vụ nhanh chóng, uy tín và chuyên nghiệp
@@ -96,11 +108,14 @@
             <button class="control-btn" id="nextBtn">❯</button>
             <div class="pagination" id="pagination"></div>
         </div>
+        <div class="more-btn-container" style="text-align: center; margin-top: 20px;">
+            <a href="services.html" class="more-btn">Tìm Hiểu Thêm</a>
+        </div>
     </section>
 
     <!-- About -->
     <section id="about" class="section light">
-        <h2 class="section-title">Về TECHFIX</h2>
+        <h2 class="section-title">Giới Thiệu TECHFIX</h2>
         <div class="about-container">
             <img src="images/hometech.jpg" alt="HomeTech logo" />
             <div>
@@ -128,7 +143,7 @@
             <input type="text" placeholder="Tên của bạn" />
             <input type="email" placeholder="Email của bạn" />
             <textarea rows="5" placeholder="Gửi về chúng tôi..."></textarea>
-            <button type="submit" class="btn-primary w-full">Send Message</button>
+            <button type="submit" class="btn-primary w-full">Gửi</button>
         </form>
     </section>
 
