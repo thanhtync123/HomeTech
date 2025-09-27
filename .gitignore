@@ -4,6 +4,8 @@
 *.suo
 *.userosscache
 *.sln.docstates
+appsettings.json
+appsettings.*.json 
 
 # Build
 bin/

@@ -1,0 +1,19 @@
+﻿
+@inject HomeTechBlazor.Components.Shared.CurrentUser CurrentUser
+@inject NavigationManager NavigationManager
+
+@code {
+
+    protected override void OnInitialized()
+    {
+        if (CurrentUser.name == string.Empty)
+        {
+            NavigationManager.NavigateTo("/login");
+            return;
+        }
+      
+        if (CurrentUser.name != string.Empty && CurrentUser.role == "customer")
+            NavigationManager.NavigateTo("/?error=forbidden");
+        
+    }
+}

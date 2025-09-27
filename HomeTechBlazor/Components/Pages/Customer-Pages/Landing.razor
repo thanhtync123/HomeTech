@@ -3,16 +3,28 @@
 @layout LandingLayout
 @inject IJSRuntime JS
 
-@code {
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            await JS.InvokeVoidAsync("landingPage.init");
-        }
-    }
-}
 
+
+@rendermode InteractiveServer
+@inject NavigationManager NavigationManager
+@inject HomeTechBlazor.Components.Shared.CurrentUser CurrentUser
+
+
+<Toast @ref="toastComponent" />
+
+<!-- layout -->
+<a href="/home">Trang quản trị</a>
+@if (CurrentUser.name != string.Empty)
+{
+    <p>Xin chào @Name</p>
+    <a href="/profile">Hồ sơ</a>
+    <a @onclick="SignOut">Đăng xuất</a>
+}
+else
+{
+    <a href="/register" >Đăng ký</a>
+    <a href="/login">Đăng nhập</a>
+}
 <div class="page-wrapper">
 
     <!-- Navbar -->
@@ -137,3 +149,51 @@
         <p class="copy">© 2025 HomeTech. All rights reserved.</p>
     </footer>
 </div>
+
+
+@code {
+    private Toast toastComponent;
+    private string? errorMessage;
+    private string Name => CurrentUser.name;
+
+    protected override void OnInitialized()
+    {
+        var uri = new Uri(NavigationManager.Uri);
+        var query = Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(uri.Query);
+
+        if (query.TryGetValue("error", out var errorValue))
+        {
+            if (errorValue == "forbidden")
+            {
+                errorMessage = "Bạn không có quyền truy cập trang này";
+            }
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && !string.IsNullOrEmpty(errorMessage))
+        {
+            toastComponent.ShowError(errorMessage);
+            errorMessage = null; // clear sau khi hiển thị
+        }
+    }
+    private void SignOut()
+    {
+        CurrentUser.name = string.Empty;
+        CurrentUser.role = string.Empty;
+        CurrentUser.id = 0;
+        CurrentUser.phone = string.Empty;
+        CurrentUser.address = string.Empty;
+        NavigationManager.NavigateTo("/");
+    }
+    //     protected override async Task OnAfterRenderAsync(bool firstRender)
+    // {
+    //     if (firstRender)
+    //     {
+    //         await JS.InvokeVoidAsync("landingPage.init");
+    //     }
+    // }
+}
+
+

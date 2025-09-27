@@ -1,5 +1,5 @@
 ﻿@inherits LayoutComponentBase
-
+@inject CurrentUser CurrentUser
 <div class="page">
     <div class="sidebar">
         <NavMenu />
@@ -7,6 +7,7 @@
 
     <main>
         <div class="top-row px-4">
+           <p>Xin chào @name</p>
          <a href="/">Trang chủ</a>
         </div>
 
@@ -21,3 +22,10 @@
     <a href="." class="reload">Reload</a>
     <span class="dismiss">🗙</span>
 </div>
+@code {
+    private string name;
+    protected override void OnInitialized()
+    {
+        name = CurrentUser.name;
+    }
+}

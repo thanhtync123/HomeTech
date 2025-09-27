@@ -3,6 +3,8 @@
 @layout LandingLayout
 @inject LoginService loginService
 @inject NavigationManager NavigationManager
+@inject CurrentUser CurrentUser
+
 
 <h3>Đăng nhập</h3>
 
@@ -25,31 +27,28 @@
 </div>
 
 <Toast @ref="toastComponent" />
-
 @code {
     private Toast toastComponent;
     private HomeTechBlazor.Model.LoginModel loginModel = new();
-
+    private void setCurrentUser(string role, string phone, string name, string address)
+    {
+        CurrentUser.role = role;
+        CurrentUser.phone = phone;
+        CurrentUser.name = name;
+        CurrentUser.address = address;
+        CurrentUser.isLoggedIn = true;
+    }
     private async Task OnValidSubmit()
     {
         try
         {
-            var role = await loginService.LoginAsync(loginModel.Phone, loginModel.Password);
-            if (role != null)
-            {
-                toastComponent.ShowSuccess("Đăng nhập thành công!");
-                await Task.Delay(1500);
-
-                if (role == "customer")
-                    NavigationManager.NavigateTo("/");
-                else if (role == "admin")
-                    NavigationManager.NavigateTo("/home");
-                else
-                    NavigationManager.NavigateTo("/"); // fallback
-            }
-            else
-                toastComponent.ShowError("Sai tài khoản hoặc mật khẩu");
-        }
+        var json = await loginService.LoginAsync(loginModel.Phone, loginModel.Password);
+        if (json == null) { toastComponent.ShowError("Sai tài khoản hoặc mật khẩu"); return; }
+        var user = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, string>>(json)!;
+        setCurrentUser(user["role"], user["phone"], user["name"], user["address"]);
+        NavigationManager.NavigateTo(user["role"] == "admin" ? "/home" : "/");     
+         }
+        
         catch (Exception e)
         {
             toastComponent.ShowError(e.Message);

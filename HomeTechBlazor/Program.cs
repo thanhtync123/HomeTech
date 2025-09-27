@@ -1,4 +1,5 @@
 ﻿using HomeTechBlazor.Components;
+using HomeTechBlazor.Components.Shared;
 using HomeTechBlazor.Service;
 using MudBlazor;
 using MudBlazor.Services;
@@ -14,6 +15,7 @@ builder.Services.AddScoped <LoginService>();
 builder.Services.AddScoped<ServiceService>();
 builder.Services.AddScoped<OrderService>();
 builder.Services.AddScoped<UserService>();
+builder.Services.AddSingleton<CurrentUser>();
 builder.Services.AddMudServices();
 
 var app = builder.Build();

@@ -1,6 +1,7 @@
 ﻿@page "/user"
 @rendermode InteractiveServer
 @inject UserService userService
+@inherits HomeTechBlazor.Components.Shared.AdminPageBase
 <h3>user</h3>
 <EditForm Model="@userModel" FormName="form_users" OnValidSubmit="Create">
 	<DataAnnotationsValidator />

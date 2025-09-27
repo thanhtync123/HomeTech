@@ -10,5 +10,10 @@ namespace HomeTechBlazor.Model
 
         [Required(ErrorMessage = "Mật khẩu không được để trống")]
         public string Password { get; set; } = string.Empty;
+        public string? Name { get; set; }
+
+        public string? Address { get; set; }
+
+
     }
 }
