@@ -1,0 +1,63 @@
+﻿@page "/register"
+@rendermode InteractiveServer
+@layout LandingLayout
+@inject UserService userService
+@inject NavigationManager NavigationManager
+
+
+
+<h3>Đăng ký</h3>
+<EditForm Model="@userModel" FormName="form_users" OnValidSubmit="SubmitTask">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <label>Tên người dùng</label>
+    <InputText @bind-Value="userModel.Name" class="form-control" />
+    <ValidationMessage For="@(() => userModel.Name)" />
+    <label>SĐT</label>
+    <InputText @bind-Value="userModel.Phone" class="form-control" />
+    <ValidationMessage For="@(() => userModel.Phone)" />
+    <label>Mật khẩu</label>
+    <InputText @bind-Value="userModel.Password" class="form-control" />
+    <ValidationMessage For="@(() => userModel.Password)" />
+    <label>Địa chỉ</label>
+    <InputTextArea @bind-Value="userModel.Address" class="form-control" />
+    <ValidationMessage For="@(() => userModel.Address)" />
+    <button type="submit">đây là nút Đăng ký</button>
+</EditForm>
+
+<Toast @ref="toastComponent" />
+
+
+
+@code {
+    private Toast toastComponent;
+    private HomeTechBlazor.Model.Users userModel = new()
+    {
+        Role = "customer"
+    };
+    private void Show()
+    {
+        toastComponent.ShowSuccess("Đăng ký thành công!");
+    }
+    private async Task SubmitTask()
+    {
+        try
+        {
+      
+            await userService.RegisterSync(userModel);
+            toastComponent.ShowSuccess("Đăng ký thành công!");
+            await Task.Delay(3000);
+            NavigationManager.NavigateTo("/login");
+            userModel = new()
+            {
+                Role = "customer"
+            }; 
+        }
+        catch (Exception e)
+        {
+            if (e.Message == $"Duplicate entry '{userModel.Phone}' for key 'users.phone'") 
+                toastComponent.ShowError("Tài khoản đã tồn tại, vui lòng chọn tài khoản khác");
+            Console.Write(e.ToString);
+        }
+    }
+}

@@ -19,6 +19,7 @@ namespace HomeTechBlazor.Model
         [StringLength(100, MinimumLength = 6, ErrorMessage = "Mật khẩu phải từ 6 đến 100 ký tự")]
         public string Password { get; set; } = string.Empty;
 
+        [Required(ErrorMessage = "Địa chỉ không được để trống")]
         [StringLength(200, ErrorMessage = "Địa chỉ tối đa 200 ký tự")]
         public string Address { get; set; } = string.Empty;
 

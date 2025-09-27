@@ -65,6 +65,19 @@ namespace HomeTechBlazor.Service
             await cmd.ExecuteNonQueryAsync();
 
         }
+        public async Task RegisterSync(Users u)
+        {
+
+            await using var conn = await GetOpenConnectionAsync();
+
+            string sql = $@"
+            INSERT INTO users (name, phone, password, address) VALUES
+            ('{u.Name}', '{u.Phone}', '{u.Password}', '{u.Address}')
+            ";
+            var cmd = new MySqlCommand(sql, conn);
+            await cmd.ExecuteNonQueryAsync();
+
+        }
         public async Task UpdateSync(Users u)
         {
 
@@ -98,5 +111,6 @@ namespace HomeTechBlazor.Service
             await cmd.ExecuteNonQueryAsync();
 
         }
+
     }
 }

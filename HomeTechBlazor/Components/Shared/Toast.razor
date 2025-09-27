@@ -1,0 +1,145 @@
+﻿@implements IDisposable
+@inject IJSRuntime JSRuntime
+
+<div class="toast-container position-fixed top-0 end-0 p-3">
+    @foreach (var toast in _toastList)
+    {
+        <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header @GetHeaderClass(toast.Type)">
+                <strong class="me-auto text-white">@toast.Title</strong>
+                <small class="text-white">@toast.Time</small>
+                <button type="button" class="btn-close btn-close-white" @onclick="() => RemoveToast(toast)"></button>
+            </div>
+            <div class="toast-body">
+                @toast.Message
+                @if (toast.ShowProgressBar)
+                {
+                    <div class="progress mt-2" style="height: 3px;">
+                        <div class="@GetProgressClass(toast.Type)" role="progressbar" 
+                             style="width: @toast.Progress%"></div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private List<ToastItem> _toastList = new();
+    private System.Timers.Timer _timer;
+
+    protected override void OnInitialized()
+    {
+        _timer = new System.Timers.Timer(100);
+        _timer.Elapsed += UpdateProgress;
+        _timer.Start();
+    }
+
+    public void ShowToast(string message, ToastType type = ToastType.Info, 
+                         string title = "Thông báo", int duration = 5000)
+    {
+        var toast = new ToastItem
+        {
+            Id = Guid.NewGuid(),
+            Message = message,
+            Title = title,
+            Type = type,
+            Duration = duration,
+            TimeLeft = duration,
+            ShowProgressBar = true,
+            Time = DateTime.Now.ToString("HH:mm:ss")
+        };
+
+        _toastList.Add(toast);
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void ShowSuccess(string message, string title = "Thành công") => 
+        ShowToast(message, ToastType.Success, title);
+
+    public void ShowError(string message, string title = "Lỗi") => 
+        ShowToast(message, ToastType.Error, title);
+
+    public void ShowWarning(string message, string title = "Cảnh báo") => 
+        ShowToast(message, ToastType.Warning, title);
+
+    public void ShowInfo(string message, string title = "Thông tin") => 
+        ShowToast(message, ToastType.Info, title);
+
+    private void UpdateProgress(object sender, System.Timers.ElapsedEventArgs e)
+    {
+        var expiredToasts = new List<ToastItem>();
+        
+        foreach (var toast in _toastList)
+        {
+            toast.TimeLeft -= 100;
+            toast.Progress = 100 - ((toast.TimeLeft / (float)toast.Duration) * 100);
+            
+            if (toast.TimeLeft <= 0)
+                expiredToasts.Add(toast);
+        }
+        
+        if (expiredToasts.Any())
+        {
+            foreach (var toast in expiredToasts)
+                _toastList.Remove(toast);
+                
+            InvokeAsync(StateHasChanged);
+        }
+        else if (_toastList.Any())
+        {
+            InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private void RemoveToast(ToastItem toast)
+    {
+        _toastList.Remove(toast);
+        InvokeAsync(StateHasChanged);
+    }
+
+    private string GetHeaderClass(ToastType type) => type switch
+    {
+        ToastType.Success => "bg-success",
+        ToastType.Error => "bg-danger",
+        ToastType.Warning => "bg-warning text-dark",
+        ToastType.Info => "bg-info text-dark",
+        _ => "bg-primary"
+    };
+
+    private string GetProgressClass(ToastType type) => type switch
+    {
+        ToastType.Success => "progress-bar bg-success",
+        ToastType.Error => "progress-bar bg-danger",
+        ToastType.Warning => "progress-bar bg-warning",
+        ToastType.Info => "progress-bar bg-info",
+        _ => "progress-bar bg-primary"
+    };
+
+    public void Dispose()
+    {
+        _timer?.Stop();
+        _timer?.Dispose();
+    }
+
+    public class ToastItem
+    {
+        public Guid Id { get; set; }
+        public string Title { get; set; }
+        public string Message { get; set; }
+        public string Time { get; set; }
+        public ToastType Type { get; set; }
+        public int Duration { get; set; }
+        public int TimeLeft { get; set; }
+        public float Progress { get; set; }
+        public bool ShowProgressBar { get; set; }
+    }
+
+    public enum ToastType
+    {
+        Info,
+        Success,
+        Error,
+        Warning
+    }
+}

@@ -1,0 +1,58 @@
+﻿@page "/login"
+@rendermode InteractiveServer
+@layout LandingLayout
+@inject LoginService loginService
+@inject NavigationManager NavigationManager
+
+<h3>Đăng nhập</h3>
+
+<EditForm Model="@loginModel" FormName="form_login" OnValidSubmit="OnValidSubmit">
+    <DataAnnotationsValidator />
+
+    <label>Số điện thoại</label>
+    <InputText @bind-Value="loginModel.Phone" class="form-control" />
+    <ValidationMessage For="@(() => loginModel.Phone)" />
+
+    <label>Mật khẩu</label>
+    <InputText type="password" @bind-Value="loginModel.Password" class="form-control" />
+    <ValidationMessage For="@(() => loginModel.Password)" />
+
+    <button type="submit" class="btn btn-primary mt-3">Đăng nhập</button>
+</EditForm>
+
+<div class="mt-3">
+    <a href="/register">Chưa có tài khoản? Đăng ký ngay</a>
+</div>
+
+<Toast @ref="toastComponent" />
+
+@code {
+    private Toast toastComponent;
+    private HomeTechBlazor.Model.LoginModel loginModel = new();
+
+    private async Task OnValidSubmit()
+    {
+        try
+        {
+            var role = await loginService.LoginAsync(loginModel.Phone, loginModel.Password);
+            if (role != null)
+            {
+                toastComponent.ShowSuccess("Đăng nhập thành công!");
+                await Task.Delay(1500);
+
+                if (role == "customer")
+                    NavigationManager.NavigateTo("/");
+                else if (role == "admin")
+                    NavigationManager.NavigateTo("/home");
+                else
+                    NavigationManager.NavigateTo("/"); // fallback
+            }
+            else
+                toastComponent.ShowError("Sai tài khoản hoặc mật khẩu");
+        }
+        catch (Exception e)
+        {
+            toastComponent.ShowError(e.Message);
+        }
+    }
+}

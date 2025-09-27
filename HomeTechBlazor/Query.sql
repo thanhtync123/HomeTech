@@ -84,5 +84,64 @@ CREATE TABLE reviews (
 
 -- ====================================================================================
 
+SELECT 
+    o.id,
+    c.name AS customer_name,
+    t.name AS technician_name,
+    s.name AS service_name,
+    o.schedule_time,
+    o.status,
+    o.total_price,
+    o.created_at,
+    o.updated_at
+FROM orders o
+JOIN services s ON o.service_id = s.id
+JOIN users c ON o.customer_id = c.id
+LEFT JOIN users t ON o.technician_id = t.id;
+
+INSERT INTO orders (customer_id, service_id, technician_id, schedule_time, status, total_price)
+VALUES
+(1, 1, 2, '2025-09-25 09:00:00', 'pending', 250000),
+(1, 2, 2, '2025-09-26 14:30:00', 'completed', 150000),
+(1, 1, NULL, '2025-09-27 10:00:00', 'cancelled', 250000);
+
+  SELECT 
+    o.id,
+    c.name AS customer_name,
+    t.name AS technician_name,
+    s.name AS service_name,
+    DATE_FORMAT(o.schedule_time, '%d%m%Y %H:%i') AS schedule_time,
+    o.status,
+    o.total_price,
+    DATE_FORMAT(o.created_at, '%d%m%Y %H:%i') AS created_at,
+    DATE_FORMAT(o.updated_at, '%d%m%Y %H:%i') AS updated_at
+FROM orders o
+JOIN services s ON o.service_id = s.id
+JOIN users c ON o.customer_id = c.id
+LEFT JOIN users t ON o.technician_id = t.id;
+
+
+INSERT INTO users (name, phone, password, address, role) VALUES
+('Nguyen Van D', '0900000004', '123456', 'Hai Phong', 'customer')
+
+DELETE FROM users where id = 50
+            UPDATE users
+            SET
+                name = 'Pham Van Renbnnn',
+                phone = '0900000018',
+                password = '123456',
+                address = 'Gia Lai',
+                role = 'technical'
+            WHERE id = 43
+
+            UPDATE users
+            SET
+                name = 'Pham Van Renbnnn123123213',
+                phone = '0900000018',
+                password = '123456',
+                address = 'Gia Lai',
+                role = 'technical',
+            WHERE id = 43;
+select count(*) from users where phone = and password = 
 
 
