@@ -1,0 +1,39 @@
+﻿
+@if (show && !string.IsNullOrEmpty(Message))
+{
+    <div class="alert @GetAlertClass()" role="alert">
+        @Message
+    </div>
+}
+
+@code {
+    [Parameter] public string Message { get; set; }
+    [Parameter] public string Type { get; set; } = "Info";
+    [Parameter] public int Duration { get; set; } = 3000; // ms
+
+    private bool show = true;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        show = !string.IsNullOrEmpty(Message);
+        if (show && Duration > 0)
+        {
+            await Task.Delay(Duration);
+            show = false;
+            StateHasChanged();
+        }
+    }
+
+    private string GetAlertClass()
+    {
+        return Type switch
+        {
+            "Success" => "alert-success",
+            "Error" => "alert-danger",
+            "Warning" => "alert-warning",
+            "Info" => "alert-info",
+            _ => "alert-secondary"
+        };
+    }
+}
+

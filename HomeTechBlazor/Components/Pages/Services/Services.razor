@@ -1,0 +1,194 @@
+﻿@page "/service"
+@rendermode InteractiveServer
+@inject ServiceService serviceService
+
+<h3>Dịch vụ</h3>
+<Alert Type="Success" Message="@msg" Duration="2000" />
+
+<EditForm Model="@serviceModel" FormName="form_services" OnValidSubmit="CreateService">
+    <DataAnnotationsValidator />
+    <label>ID</label>
+    <InputNumber @bind-Value="serviceModel.Id" class="form-control" />
+    <label>Tên dịch vụ</label>
+    <InputText @bind-Value="serviceModel.Name" class="form-control" />
+    <ValidationMessage For="@(() => serviceModel.Name)" />
+    <label>Mô tả</label>
+    <InputTextArea @bind-Value="serviceModel.Description" class="form-control" />
+    <ValidationMessage For="@(() => serviceModel.Description)" />
+    <label>Giá</label>
+    <InputNumber @bind-Value="serviceModel.Price" class="form-control" />
+    <ValidationMessage For="@(() => serviceModel.Price)" />
+    <label>Đơn vị</label>
+    <InputSelect @bind-Value="serviceModel.Unit" class="form-control">
+        <option value="">-- Chọn đơn vị --</option>
+        <option value="lần">lần</option>
+        <option value="cái">cái</option>
+        <option value="điểm">điểm</option>
+        <option value="bộ">bộ</option>
+        <option value="m2">m2</option>
+        <option value="bồn">bồn</option>
+    </InputSelect>
+    <ValidationMessage For="@(() => serviceModel.Unit)" />
+    <button type="submit" class="btn btn-danger me-2" disabled="@(isEdited)">Thêm</button>
+    <button type="button" class="btn btn-danger me-2" disabled="@(!isEdited)" @onclick="() => DeleteService(serviceModel.Id)">Xóa</button>
+    <button type="button" class="btn btn-danger me-2" disabled="@(!isEdited)" @onclick="UpdateService">Sửa</button>
+    <button type="button" class="btn btn-danger me-2" @onclick="RefreshClick">Làm mới</button>
+</EditForm>
+
+<input value="@keyword" @oninput="SearchService" />
+
+<!-- bảng có sort bằng DataTables -->
+<table id="servicesTable" class="table table-striped table-bordered">
+    <thead>
+        <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Tên dịch vụ</th>
+            <th scope="col">Mô tả</th>
+            <th scope="col">Giá dịch vụ</th>
+            <th scope="col">Đơn vị</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in lsv)
+        {
+            <tr @onclick="() => CellClick(item)" style="cursor:pointer">
+                <td>@item.Id</td>
+                <td>@item.Name</td>
+                <td>@item.Description</td>
+                <td>@item.Price.ToString("N0")</td>
+                <td>@item.Unit</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<p>
+    @currentpage / @totalpage
+    <button class="btn btn-outline-secondary" @onclick="DownPage"> Giảm </button>
+    <button class="btn btn-outline-secondary" @onclick="UpPage"> Tăng </button>
+</p>
+<p>@msg</p>
+
+
+@code {
+    List<HomeTechBlazor.Model.Services> lsv = new();
+    HomeTechBlazor.Model.Services serviceModel = new();
+    string alertType = "";
+    string msg = "";
+
+    string keyword = "";
+    int totalrecord = 0;
+    int totalpage = 0;
+    int offset = 1;
+    int pagesize = 10;
+    int currentpage = 1;
+ 
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+    private async Task LoadData()
+    {
+        totalrecord = await serviceService.CountAsync(keyword);
+        totalpage = (int)Math.Ceiling((double)totalrecord / pagesize);
+        offset = (currentpage - 1) * pagesize;
+        lsv = await serviceService.GetAllAsync(offset, pagesize, keyword);
+    }
+    private async Task UpPage()
+    {
+        if (currentpage < totalpage)
+        {
+            currentpage++;
+            offset = (currentpage - 1) * pagesize;
+            await LoadData();
+        }
+    }
+    private async Task DownPage()
+    {
+        if (currentpage > 1)
+        {
+            currentpage--;
+            offset = (currentpage - 1) * pagesize;
+            await LoadData();
+        }
+    }
+    private async Task SearchService(ChangeEventArgs e)
+    {
+        keyword = e.Value?.ToString() ?? "";
+        await LoadData();
+    }
+
+    private async Task CreateService()
+    {
+        try
+        {
+            await serviceService.CreateSync(serviceModel);
+            await LoadData();
+            serviceModel = new();
+            msg = "";
+            StateHasChanged();
+            msg = "Thêm thành công";
+            alertType = "Success";
+        }
+        catch (Exception e)
+        {
+            msg = e.ToString();
+            alertType = "Error";
+        }
+    }
+    private async Task UpdateService()
+    {
+        try
+        {
+            await serviceService.UpdateSync(serviceModel);
+            await LoadData();
+            serviceModel = new();
+            msg = "";
+            StateHasChanged();
+            msg = "Sửa thành công";
+            alertType = "Success";
+        }
+        catch (Exception e)
+        {
+            msg = e.ToString();
+            alertType = "Error";
+        }
+    }
+    private async Task DeleteService(int id)
+    {
+        try
+        {
+            await serviceService.DeleteSync(id);
+            serviceModel = new();
+            msg = "";
+            StateHasChanged();
+            msg = "Xóa thành công";
+            alertType = "Success";
+            await LoadData();
+        }
+        catch (Exception e)
+        {
+            msg = e.ToString();
+            alertType = "Error";
+        }
+    }
+    bool isEdited = false;
+    private void CellClick(HomeTechBlazor.Model.Services selected)
+    {
+        serviceModel = new HomeTechBlazor.Model.Services
+        {
+            Id = selected.Id,
+            Name = selected.Name,
+            Description = selected.Description,
+            Price = selected.Price,
+            Unit = selected.Unit
+        };
+        isEdited = true;
+    }
+    private void RefreshClick()
+    {
+        serviceModel = new HomeTechBlazor.Model.Services();
+        isEdited = false;
+    }
+}

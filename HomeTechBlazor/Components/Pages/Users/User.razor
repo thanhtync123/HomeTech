@@ -1,0 +1,206 @@
+﻿@page "/user"
+@rendermode InteractiveServer
+@inject UserService userService
+<h3>user</h3>
+<EditForm Model="@userModel" FormName="form_users" OnValidSubmit="Create">
+	<DataAnnotationsValidator />
+	<label>ID</label>
+	<InputNumber @bind-Value="userModel.Id" class="form-control" />
+	<label>Tên người dùng</label>
+	<InputText @bind-Value="userModel.Name" class="form-control" />
+	<ValidationMessage For="@(() => userModel.Name)" />
+	<label>Địa chỉ</label>
+	<InputTextArea @bind-Value="userModel.Address" class="form-control" />
+	<ValidationMessage For="@(() => userModel.Address)" />
+	<label>SĐT</label>
+	<InputText @bind-Value="userModel.Phone" class="form-control" />
+	<ValidationMessage For="@(() => userModel.Phone)" />
+	<label>Mật khẩu</label>
+	<InputText @bind-Value="userModel.Password" class="form-control" />
+	<ValidationMessage For="@(() => userModel.Password)" />
+	<label>Loại</label>
+	<InputSelect @bind-Value="userModel.Role" class="form-control">
+		<option value="">-- Chọn quyền --</option>
+		<option value="admin">Admin</option>
+		<option value="customer">Khách hàng</option>
+		<option value="technical">Kỹ thuật</option>
+	</InputSelect>
+	<ValidationMessage For="@(() => userModel.Role)" />
+	<button type="submit" class="btn btn-danger me-2" disabled="@(isEdited)">Thêm</button>
+	<button type="button" class="btn btn-danger me-2" disabled="@(!isEdited)" @onclick="() => Delete(userModel.Id)">Xóa</button>
+	<button type="button" class="btn btn-danger me-2" disabled="@(!isEdited)" @onclick="Update">Cập nhật</button>
+	<button type="button" class="btn btn-danger me-2"  @onclick="Refresh">Làm mới</button>
+</EditForm>
+
+<div class="input-group input-group-sm mb-3">
+	<span class="input-group-text" id="inputGroup-sizing-sm">Tìm kiếm</span>
+	<input value="@keyword" @oninput="Search" type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm">
+</div>
+<div>
+	<select class="form-control" value="@role" @onchange="(e) => RoleChanged(e.Value?.ToString())">
+		<option value="">-- Chọn quyền --</option>
+		<option value="admin">Admin</option>
+		<option value="customer">Khách hàng</option>
+		<option value="technical">Kỹ thuật</option>
+	</select>
+
+	
+</div>
+		@* <select value="@item.Status" @onchange="(e) => UpdateStatus(item.Id, e.Value?.ToString())"> *@
+
+<table class="table table-bordered table-striped table-hover">
+	<thead class="table-dark">
+		<tr>
+			<th>ID</th>
+			<th>Tên người dùng</th>
+			<th>Địa chỉ</th>
+			<th>SĐT</th>
+			<th>Mật khẩu</th>
+			<th>Loại</th>
+		</tr>
+	</thead>
+	<tbody>
+		@foreach (var item in lu)
+		{
+			<tr @onclick="() => CellClick(item)" style="cursor:pointer">
+				<td>@item.Id</td>
+				<td>@item.Name</td>
+				<td>@item.Address</td>
+				<td>@item.Phone</td>
+				<td>@item.Password</td>
+				<td>@item.Role</td>
+			</tr>
+		}
+	</tbody>
+
+</table>
+<p>@a</p>
+<p>
+	@currentpage / @totalpage
+	<button class="btn btn-outline-secondary" @onclick="DownPage"> Giảm </button>
+	<button class="btn btn-outline-secondary" @onclick="UpPage"> Tăng </button>
+</p>
+@code {
+	List<HomeTechBlazor.Model.Users> lu = new();
+	HomeTechBlazor.Model.Users userModel = new();
+
+	string keyword = "";
+	int totalrecord = 0;
+	int totalpage = 0;
+	int offset = 1;
+	int pagesize = 10;
+	int currentpage = 1;
+
+	string msg = "",role="";
+	bool isEdited = false;
+	int a=0;
+
+	protected override async Task OnInitializedAsync()
+	{
+		await LoadData();
+	}
+	private async Task LoadData()
+	{
+		totalrecord = await userService.CountAsync(keyword);
+		totalpage = (int)Math.Ceiling((double)totalrecord / pagesize);
+		offset = (currentpage - 1) * pagesize;
+		lu = await userService.GetAllAsync(offset, pagesize, keyword);
+		a++;
+	}
+	private async Task UpPage()
+	{
+		if (currentpage < totalpage)
+		{
+			currentpage++;
+			offset = (currentpage - 1) * pagesize;
+			await LoadData();
+		}
+	}
+	private async Task DownPage()
+	{
+		if (currentpage > 1)
+		{
+			currentpage--;
+			offset = (currentpage - 1) * pagesize;
+			await LoadData();
+		}
+	}
+	private async Task Search(ChangeEventArgs e)
+	{
+		keyword = e.Value?.ToString() ?? "";
+		await LoadData();
+	}
+	private async Task Create()
+	{
+		try
+		{
+			await userService.CreateSync(userModel);
+			await LoadData();
+			userModel = new();
+			msg = "";
+			StateHasChanged();
+			msg = "Thêm thành công";
+		}
+		catch (Exception e)
+		{
+			msg = e.ToString();
+		}
+	}
+	private void CellClick(Users selected)
+	{
+		userModel = new Users
+		{
+			Id = selected.Id,
+			Name = selected.Name,
+			Phone = selected.Phone,
+			Password = selected.Password,
+			Address = selected.Address,
+			Role = selected.Role,
+		};
+		isEdited = true;
+	}
+	private async Task Update()
+	{
+		try
+		{
+			await userService.UpdateSync(userModel);
+			await LoadData();
+			userModel = new();
+			msg = "";
+			StateHasChanged();
+			msg = "Cập nhật thành công";
+		}
+		catch (Exception e)
+		{
+			msg = e.ToString();
+		}
+	}
+	private async Task Delete(int id)
+	{
+		try
+		{
+			await userService.DeleteSync(id);
+			await LoadData();
+			userModel = new();
+			msg = "";
+			StateHasChanged();
+			msg = "Xóa thành công";
+		}
+		catch (Exception e)
+		{
+			msg = e.ToString();
+		}
+	}
+	private void Refresh()
+	{
+		isEdited = false;
+		userModel = new();
+	}
+	private async Task RoleChanged(string selectedRole)
+	{
+		keyword = role = selectedRole ?? "";
+		await LoadData(); // load dữ liệu
+	}
+
+
+}

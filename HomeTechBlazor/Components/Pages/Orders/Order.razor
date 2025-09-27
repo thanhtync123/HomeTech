@@ -1,0 +1,135 @@
+﻿@page "/order"
+@rendermode InteractiveServer
+@inject OrderService orderService
+
+<h3>Order</h3>
+<div class="input-group input-group-sm mb-3">
+	<span class="input-group-text" id="inputGroup-sizing-sm">Tìm kiếm</span>
+	<input value="@keyword" @oninput="SearchOrder" type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm">
+</div>
+<table class="table table-bordered table-striped table-hover">
+	<thead class="table-dark">
+		<tr>
+			<th>ID</th>
+			<th>Tên KH</th>
+			<th>Tên KTV</th>
+			<th>Dịch vụ</th>
+			<th>Thời gian hẹn</th>
+			<th>Trạng thái</th>
+			<th>Tổng tiền</th>
+			<th>Thời gian tạo</th>
+			<th>Thời gian cập nhật</th>
+		</tr>
+	</thead>
+	<tbody>
+		@foreach (var item in lod)
+		{
+			<tr>
+				<td>@item.Id</td>
+				<td>@item.CustomerName</td>
+				<td>@item.TechnicianName</td>
+				<td>@item.ServiceName</td>
+				<td>@item.ScheduleTime</td>
+				<td>
+					<select value="@item.Status" @onchange="(e) => UpdateStatus(item.Id, e.Value?.ToString())">
+						<option value="pending">pending</option>
+						<option value="completed">completed</option>
+						<option value="cancelled">cancelled</option>
+					</select>
+				</td>
+				<td>@item.TotalPrice</td>
+				<td>@item.CreatedAt</td>
+				<td>@item.UpdatedAt</td>
+			</tr>
+		}
+	</tbody>
+</table>
+<p>
+	@currentpage / @totalpage
+	<button class="btn btn-outline-secondary" @onclick="DownPage"> Giảm </button>
+	<button class="btn btn-outline-secondary" @onclick="UpPage"> Tăng </button>
+</p>
+@* //<button class="btn btn-outline-secondary" @onclick="UpdateStatus"> Test cập nhật trạng thái </button> *@
+<p>@a</p>
+<p>@msg</p>
+
+@code {
+	List<HomeTechBlazor.Model.Orders> lod = new();
+
+	string keyword = "";
+	int totalrecord = 0;
+	int totalpage = 0;
+	int offset = 1;
+	int pagesize = 10;
+	int currentpage = 1;
+
+	string msg = "";
+
+
+	protected override async Task OnInitializedAsync()
+	{
+		await LoadData();
+	}
+	private async Task LoadData()
+	{
+		totalrecord = await orderService.CountAsync(keyword);
+		totalpage = (int)Math.Ceiling((double)totalrecord / pagesize);
+		offset = (currentpage - 1) * pagesize;
+		lod = await orderService.GetAllAsync(offset, pagesize, keyword);
+	}
+	private async Task UpPage()
+	{
+		if (currentpage < totalpage)
+		{
+			currentpage++;
+			offset = (currentpage - 1) * pagesize;
+			await LoadData();
+		}
+	}
+	private async Task DownPage()
+	{
+		if (currentpage > 1)
+		{
+			currentpage--;
+			offset = (currentpage - 1) * pagesize;
+			await LoadData();
+		}
+	}
+	int a = 0;
+	private async Task SearchOrder(ChangeEventArgs e)
+	{
+		a++;
+		keyword = e.Value?.ToString() ?? "";
+		await LoadData();
+	}
+	private async Task UpdateStatus(int id,string newStatus)
+	{
+
+		try
+		{
+			Orders orders = new Orders
+				{
+					Id = id,
+					CustomerId = 0,
+					ServiceId = 0,
+					TechnicianId = null,
+					ScheduleTime = string.Empty,
+					Status = newStatus,
+					TotalPrice = null,
+					CreatedAt = string.Empty,
+					UpdatedAt = string.Empty,
+					CustomerName = string.Empty,
+					ServiceName = string.Empty,
+					TechnicianName = string.Empty
+				};
+			await orderService.UpdateStatusSync(orders);
+			await LoadData();
+			msg = "Sửa thành công";
+		}
+		catch (Exception e)
+		{
+			 msg = e.ToString();
+		}
+	}
+
+}
