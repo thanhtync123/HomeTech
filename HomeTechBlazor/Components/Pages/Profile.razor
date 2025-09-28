@@ -1,46 +1,116 @@
 ﻿@page "/profile"
-@inject CurrentUser currentUser
 @layout LandingLayout
 @rendermode InteractiveServer
+@using Microsoft.AspNetCore.Components.Forms
+@inject CurrentUser currentUser
 
-<h3>Profile</h3>
+<HeadContent>
+    <link href="css/profile.css" rel="stylesheet" />
+</HeadContent>
 
-<EditForm Model="@userModel" FormName="form_users">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
+<div class="profile-page">
+    <div class="profile-container">
+        <!-- Cột trái: Avatar -->
+        <div class="profile-left">
+            <div class="avatar-wrapper">
+                @if (!string.IsNullOrEmpty(avatarBase64))
+                {
+                    <img src="@avatarBase64" alt="Avatar" class="avatar-img" />
+                }
+                else
+                {
+                    <div class="avatar-circle">@GetInitial()</div>
+                }
 
-    <label>Tên người dùng</label>
-    <InputText @bind-Value="userModel.Name" class="form-control" />
-    <ValidationMessage For="@(() => userModel.Name)" />
+                <!-- Icon thay avatar -->
+                <label class="change-avatar-btn" for="avatarInput" title="Thay đổi ảnh">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="white" viewBox="0 0 24 24">
+                        <path d="M12 5c-3.859 0-7 3.141-7 7 0 3.86 3.141 7 7 7 3.86 0 7-3.14 7-7 0-3.859-3.14-7-7-7zm0 12c-2.761 0-5-2.239-5-5 0-2.762 2.239-5 5-5 2.762 0 5 2.238 5 5 0 2.761-2.238 5-5 5zm7-13h-2.586l-1.707-1.707c-.391-.391-.902-.586-1.414-.586h-4.586c-.512 0-1.023.195-1.414.586l-1.707 1.707h-2.586c-1.104 0-2 .896-2 2v12c0 1.103.896 2 2 2h16c1.104 0 2-.897 2-2v-12c0-1.104-.896-2-2-2zm0 14h-16v-12h3.586l2-2h4.828l2 2h3.586v12z" />
+                    </svg>
+                </label>
+                <InputFile id="avatarInput" OnChange="OnAvatarChange" accept="image/*" style="display:none" />
+            </div>
 
-    <label>SĐT</label>
-    <InputText @bind-Value="userModel.Phone" class="form-control" />
-    <ValidationMessage For="@(() => userModel.Phone)" />
+            <h2 class="user-name">@userModel.Name</h2>
+            @* <p class="role-tag">@userModel.Role</p> *@
+            @* <p class="phone-tag">📱 @userModel.Phone</p> *@
+        </div>
 
-    <label>Mật khẩu</label>
-    <InputText @bind-Value="userModel.Password" class="form-control" type="password" />
-    <ValidationMessage For="@(() => userModel.Password)" />
+        <!-- Cột phải: Form -->
+        <div class="profile-right">
+            <h2 class="form-title">Cập nhật thông tin</h2>
+            <EditForm Model="@userModel" OnValidSubmit="HandleValidSubmit" class="profile-form">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
 
-    <label>Địa chỉ</label>
-    <InputTextArea @bind-Value="userModel.Address" class="form-control" />
-    <ValidationMessage For="@(() => userModel.Address)" />
-     <InputText class="form-control" @bind-Value="userModel.Role" disabled />
-    <button type="submit" class="btn btn-primary"> Thay đổi</button>
-</EditForm>
+                <div class="form-group icon-input">
+                    <span class="icon">👤</span>
+                    <InputText @bind-Value="userModel.Name" class="form-control" placeholder="Tên người dùng" />
+                </div>
+
+                <div class="form-group icon-input">
+                    <span class="icon">📱</span>
+                    <InputText @bind-Value="userModel.Phone" class="form-control" placeholder="Số điện thoại" />
+                </div>
+
+                <div class="form-group icon-input">
+                    <span class="icon">🔒</span>
+                    <InputText @bind-Value="userModel.Password" type="password" class="form-control" placeholder="Mật khẩu" />
+                </div>
+
+                <div class="form-group icon-input">
+                    <span class="icon">📍</span>
+                    <InputTextArea @bind-Value="userModel.Address" class="form-control" placeholder="Địa chỉ" />
+                </div>
+
+                <div class="form-group icon-input">
+                    <span class="icon">⭐</span>
+                    <InputText class="form-control" @bind-Value="userModel.Role" disabled placeholder="Vai trò" />
+                </div>
+
+                <button type="submit" class="btn-save">💾 Lưu Thay Đổi</button>
+            </EditForm>
+        </div>
+    </div>
+</div>
 
 @code {
-    string role = "";
     private HomeTechBlazor.Model.Users userModel = new();
+    private string? avatarBase64;
 
     protected override void OnInitialized()
     {
-        userModel.Name = currentUser.name;
-        userModel.Phone = currentUser.phone;
-        userModel.Password = currentUser.password;
-        userModel.Address = currentUser.address;
-        userModel.Role = currentUser.role;
-
+        // dùng property chữ thường theo class CurrentUser của bạn
+        userModel.Name = currentUser.name ?? "Người dùng";
+        userModel.Phone = currentUser.phone ?? "";
+        userModel.Password = currentUser.password ?? "";
+        userModel.Address = currentUser.address ?? "";
+        userModel.Role = currentUser.role ?? "customer";
     }
-    
 
+    private string GetInitial()
+    {
+        if (!string.IsNullOrWhiteSpace(userModel.Name))
+            return userModel.Name.Trim()[0].ToString().ToUpper();
+        return "?";
+    }
+
+    private async Task OnAvatarChange(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+        if (file == null) return;
+
+        using var stream = file.OpenReadStream(5 * 1024 * 1024);
+        using var ms = new MemoryStream();
+        await stream.CopyToAsync(ms);
+        var bytes = ms.ToArray();
+        avatarBase64 = $"data:{file.ContentType};base64,{Convert.ToBase64String(bytes)}";
+    }
+
+    private Task HandleValidSubmit()
+    {
+        // TODO: gọi service để lưu userModel + avatarBase64 vào DB
+        Console.WriteLine("Lưu profile");
+        return Task.CompletedTask;
+    }
 }
