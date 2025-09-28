@@ -20,6 +20,7 @@
 			<th>Tổng tiền</th>
 			<th>Thời gian tạo</th>
 			<th>Thời gian cập nhật</th>
+			<th>Thao tác</th>
 		</tr>
 	</thead>
 	<tbody>
@@ -41,6 +42,9 @@
 				<td>@item.TotalPrice</td>
 				<td>@item.CreatedAt</td>
 				<td>@item.UpdatedAt</td>
+				<td>
+					<NavLink href="@($"/order_detail/{item.Id}")">Cập nhật</NavLink>
+				</td>
 			</tr>
 		}
 	</tbody>
