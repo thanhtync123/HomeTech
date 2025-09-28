@@ -13,6 +13,7 @@ builder.Services.AddScoped<LoginService>();
 builder.Services.AddScoped<ServiceService>();
 builder.Services.AddScoped<OrderService>();
 builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<OrderDetailService>();
 builder.Services.AddSingleton<CurrentUser>();
 builder.Services.AddMudServices();
 

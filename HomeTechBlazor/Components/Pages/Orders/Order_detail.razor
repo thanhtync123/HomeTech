@@ -1,6 +1,7 @@
 ﻿@page "/order_detail/{id:int}"
 @rendermode InteractiveServer
-
+@using  HomeTechBlazor.Model
+@inject OrderDetailService orderDetailService
 <EditForm Model="order" OnValidSubmit="HandleValidSubmit">
     <div class="mb-2">
         <label>Mã phiếu</label>
@@ -66,7 +67,7 @@
     <table class="table table-bordered">
         <thead>
             <tr>
-                <th>STT</th>
+                <th>Mã hàng</th>
                 <th>Tên mặt hàng</th>
                 <th>Số lượng</th>
                 <th>Đơn vị</th>
@@ -75,17 +76,20 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var item in orderProductItems)
+            @foreach (var item in equipmentOrderList)
             {
                 <tr>
-                    <td>@(orderProductItems.IndexOf(item) + 1)</td>
+                    <td>@item.IdProduct</td>
                     <td><p>@item.Name</p></td>
                     <td>
                        <input type="number" min=1 class="form-control" value="@item.Quantity" @onchange="(e) => OnQuantityChanged(item, e)" />
                     </td>
                      <td><p>@item.Unit</p></td>
-                     <td><p>@item.Price</p></td>
-               <td><p>@(item.Quantity * item.Price)</p></td>
+                     <td><p>@item.Price.ToString("N0")</p></td>
+                    <td>
+                        <p>@( (item.Quantity * item.Price).ToString("N0") )</p>
+                    </td>
+
 
                 </tr>
             }
@@ -93,7 +97,7 @@
     </table>
 
     <div class="mt-2">
-        <strong>Tổng tiền: @order.Items.Sum(i => i.Quantity * i.Price)</strong>
+        <strong>Tổng tiền: @totalPrice.ToString("N0")</strong>
     </div>
 
     <button type="submit" class="btn btn-primary mt-3">Lưu phiếu</button>
@@ -111,21 +115,20 @@
             </tr>
         </thead>
         <tbody>
-@for (int i = 1; i <= 100; i++)
+            @foreach (var item in equipmentList)
 {
-    var index = i; <!-- biến tạm -->
     <tr>
-        <td>@index</td>
-        <td>Mặt hàng @index</td>
-        <td>Cái</td>
-        <td>@(10 + index)</td>
-        <td>@(1000 * index) đ</td>
-        <td>
-            <button class="btn btn-sm btn-primary"
-                    @onclick="@(() => AddItem(index, $"Mặt hàng {index}", "Cái", 1, 1000 * index))">
-                +
-            </button>
-        </td>
+        <td>@item.IdProduct</td>
+        <td>@item.Name</td>
+        <td>@item.Unit</td>
+        <td>@item.Quantity</td>
+        <td>@item.Price.ToString("N0")</td>
+                    <td>
+                        <button class="btn btn-sm btn-primary"
+                                @onclick="() => AddItem(item.IdProduct, item.Name, item.Unit, item.Quantity, item.Price)">
+                            +
+                        </button>
+                    </td>
     </tr>
 }
         </tbody>
@@ -137,54 +140,51 @@
     [Parameter] public int id { get; set; }
 
     private OrderModel order = new();
+    private List<Equipments> equipmentList = new();
+    private List<Equipments> equipmentOrderList = new();
 
-    private List<OrderProductModel> orderProductItems = new();
+    int totalPrice = 0;
+
     private void HandleValidSubmit()
     {
 
-        
+
     }
- private void AddItem(int id, string name, string unit, int quantity, int price)
+    protected override async Task OnInitializedAsync()
     {
-        orderProductItems.Add(new OrderProductModel
+        equipmentList = await orderDetailService.getEquipmentAsync();
+    }
+    private void AddItem(int id, string name, string unit, int quantity, int price)
+    {
+        equipmentOrderList.Add(new Equipments
         {
             IdProduct = id,
             Name = name,
             Unit = unit,
-            Quantity = quantity,
+            Quantity = 1,
             Price = price
         });
+        LoadTotalPrice();
         Console.WriteLine($"Đã thêm sản phẩm: {name},{unit},{quantity},{price}");
     }
-private void OnQuantityChanged(OrderProductModel item, ChangeEventArgs e)
-{
-    if (int.TryParse(e.Value?.ToString(), out int newQuantity))
+    private void OnQuantityChanged(Equipments item, ChangeEventArgs e)
     {
-        item.Quantity = newQuantity < 1 ? 1 : newQuantity;
+        if (int.TryParse(e.Value?.ToString(), out int newQuantity))
+            item.Quantity = newQuantity;
+        LoadTotalPrice();
 
-        Console.WriteLine($"Số lượng {item.Name} thay đổi thành: {item.Quantity}");
+        
     }
-}
-
-    public class OrderModel
+    private void LoadTotalPrice()
     {
-        public string IdOrder { get; set; } = "";
-        public string CustomerName { get; set; } = "";
-        public string ServiceId { get; set; } = "";
-        public string TechnicianId { get; set; } = "";
-        public string Status { get; set; } = "pending";
-        public DateTime AppointmentTime { get; set; } = DateTime.Now;
-        public DateTime CreatedDate { get; set; } = DateTime.Now;
-        public DateTime? UpdatedDate { get; set; }
-        public List<OrderProductModel> Items { get; set; } = new();
+        totalPrice = 0; 
+        foreach (var item in equipmentOrderList)
+        
+            totalPrice += item.Quantity * item.Price;
+        
     }
+
+
     
-    public class OrderProductModel
-    {
-        public int IdProduct { get; set; } = 0;
-        public string Name { get; set; } = "";
-        public string Unit { get; set; } = "";
-        public int Quantity { get; set; } = 1;
-        public int Price { get; set; } = 0;
-    }
+
 }
