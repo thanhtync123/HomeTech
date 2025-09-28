@@ -1,0 +1,170 @@
+﻿/* Toàn màn hình */
+.login-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #1e3c72, #2a5298);
+    background-attachment: fixed;
+    overflow: hidden;
+    position: relative;
+}
+
+    /* Hiệu ứng wave */
+    .login-page::before {
+        content: "";
+        position: absolute;
+        width: 200%;
+        height: 200%;
+        top: -50%;
+        left: -50%;
+        background: radial-gradient(circle at center, rgba(255,255,255,0.1) 0%, transparent 70%);
+        animation: rotateBg 20s linear infinite;
+    }
+
+@keyframes rotateBg {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Card trong suốt */
+.login-card {
+    position: relative;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(12px);
+    border-radius: 20px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    padding: 2.5rem;
+    width: 100%;
+    max-width: 400px;
+    z-index: 2;
+    animation: fadeInUp 1s ease;
+}
+
+/* Header */
+.login-header {
+    text-align: center;
+    margin-bottom: 2rem;
+    color: #fff;
+}
+
+    .login-header h2 {
+        font-size: 2rem;
+        margin-bottom: 0.3rem;
+    }
+
+    .login-header p {
+        font-size: 1rem;
+        opacity: 0.85;
+    }
+
+/* Form */
+.form-group {
+    margin-bottom: 1.2rem;
+    position: relative;
+}
+
+.icon-input .icon {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.2rem;
+    opacity: 0.7;
+}
+
+.form-control {
+    width: 100%;
+    padding: 0.75rem 1rem 0.75rem 2.5rem;
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    background: rgba(255,255,255,0.85);
+    transition: all 0.3s;
+}
+
+    .form-control:focus {
+        background: #fff;
+        box-shadow: 0 0 10px rgba(42, 82, 152, 0.6);
+        outline: none;
+    }
+
+/* Nút đăng nhập */
+.btn-login {
+    width: 100%;
+    padding: 1rem;
+    border: none;
+    border-radius: 14px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #fff;
+    cursor: pointer;
+    background: linear-gradient(135deg, #ff512f, #dd2476, #1e3c72, #2a5298);
+    background-size: 400% 400%;
+    animation: gradientShift 8s ease infinite;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.25);
+    transition: transform 0.2s ease;
+}
+
+    .btn-login:hover {
+        transform: scale(1.05);
+        box-shadow: 0 8px 22px rgba(0,0,0,0.3);
+    }
+
+@keyframes gradientShift {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+/* Link đăng ký */
+.register-link {
+    margin-top: 1.5rem;
+    text-align: center;
+    color: #fff;
+}
+
+    .register-link a {
+        color: #ffdd57;
+        font-weight: 600;
+        text-decoration: none;
+        transition: color 0.3s;
+    }
+
+        .register-link a:hover {
+            color: #ffd700;
+        }
+
+/* Validation */
+.validation-message {
+    color: #ff6b6b;
+    font-size: 0.85rem;
+    margin-top: 0.3rem;
+    display: block;
+}
+
+/* Animation */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(40px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

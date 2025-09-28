@@ -15,4 +15,8 @@
     <None Include="wwwroot\js\Landing.js" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\uploads\" />
+  </ItemGroup>
+
 </Project>

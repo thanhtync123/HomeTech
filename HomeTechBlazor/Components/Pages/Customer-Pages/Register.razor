@@ -4,58 +4,72 @@
 @inject UserService userService
 @inject NavigationManager NavigationManager
 
+<HeadContent>
+    <link href="css/register.css" rel="stylesheet" />
+</HeadContent>
 
+<div class="register-page">
+    <div class="register-card">
+        <div class="register-header">
+            <h2>Đăng Ký Tài Khoản</h2>
+            <p>Trải nghiệm dịch vụ tiện ích cùng TECHFIX</p>
+        </div>
 
-<h3>Đăng ký</h3>
-<EditForm Model="@userModel" FormName="form_users" OnValidSubmit="SubmitTask">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
-    <label>Tên người dùng</label>
-    <InputText @bind-Value="userModel.Name" class="form-control" />
-    <ValidationMessage For="@(() => userModel.Name)" />
-    <label>SĐT</label>
-    <InputText @bind-Value="userModel.Phone" class="form-control" />
-    <ValidationMessage For="@(() => userModel.Phone)" />
-    <label>Mật khẩu</label>
-    <InputText @bind-Value="userModel.Password" class="form-control" />
-    <ValidationMessage For="@(() => userModel.Password)" />
-    <label>Địa chỉ</label>
-    <InputTextArea @bind-Value="userModel.Address" class="form-control" />
-    <ValidationMessage For="@(() => userModel.Address)" />
-    <button type="submit">đây là nút Đăng ký</button>
-</EditForm>
+        <EditForm Model="@userModel" FormName="form_users" OnValidSubmit="SubmitTask" class="register-form">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <div class="form-group icon-input">
+                <span class="icon">👤</span>
+                <InputText @bind-Value="userModel.Name" placeholder="Tên người dùng" class="form-control" />
+                <ValidationMessage For="@(() => userModel.Name)" />
+            </div>
+
+            <div class="form-group icon-input">
+                <span class="icon">📱</span>
+                <InputText @bind-Value="userModel.Phone" placeholder="Số điện thoại" class="form-control" />
+                <ValidationMessage For="@(() => userModel.Phone)" />
+            </div>
+
+            <div class="form-group icon-input">
+                <span class="icon">🔒</span>
+                <InputText @bind-Value="userModel.Password" type="password" placeholder="Mật khẩu" class="form-control" />
+                <ValidationMessage For="@(() => userModel.Password)" />
+            </div>
+
+            <div class="form-group icon-input">
+                <span class="icon">📍</span>
+                <InputTextArea @bind-Value="userModel.Address" placeholder="Địa chỉ" class="form-control" />
+                <ValidationMessage For="@(() => userModel.Address)" />
+            </div>
+
+            <button type="submit" class="btn-register">🚀 Đăng Ký Ngay</button>
+        </EditForm>
+    </div>
+</div>
 
 <Toast @ref="toastComponent" />
-
-
 
 @code {
     private Toast toastComponent;
     private HomeTechBlazor.Model.Users userModel = new()
-    {
-        Role = "customer"
-    };
-    private void Show()
-    {
-        toastComponent.ShowSuccess("Đăng ký thành công!");
-    }
+        {
+            Role = "customer"
+        };
+
     private async Task SubmitTask()
     {
         try
         {
-      
             await userService.RegisterSync(userModel);
             toastComponent.ShowSuccess("Đăng ký thành công!");
             await Task.Delay(3000);
             NavigationManager.NavigateTo("/login");
-            userModel = new()
-            {
-                Role = "customer"
-            }; 
+            userModel = new() { Role = "customer" };
         }
         catch (Exception e)
         {
-            if (e.Message == $"Duplicate entry '{userModel.Phone}' for key 'users.phone'") 
+            // if (e.Message == $"Duplicate entry '{userModel.Phone}' for key 'users.phone'")
                 toastComponent.ShowError("Tài khoản đã tồn tại, vui lòng chọn tài khoản khác");
             Console.Write(e.ToString);
         }
