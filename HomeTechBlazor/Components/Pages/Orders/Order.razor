@@ -6,7 +6,10 @@
 <h3>Order</h3>
 <div class="input-group input-group-sm mb-3">
 	<span class="input-group-text" id="inputGroup-sizing-sm">Tìm kiếm</span>
-	<input value="@keyword" @oninput="SearchOrder" type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm">
+	<input @bind-value="keyword"
+		   @bind-value:event="oninput"
+		   @onkeyup="async () => await LoadData()"
+		   class="form-control" placeholder="Tìm kiếm..." />
 </div>
 <table class="table table-bordered table-striped table-hover">
 	<thead class="table-dark">

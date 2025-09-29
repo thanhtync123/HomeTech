@@ -35,7 +35,10 @@
 
 <div class="input-group input-group-sm mb-3">
 	<span class="input-group-text" id="inputGroup-sizing-sm">Tìm kiếm</span>
-	<input value="@keyword" @oninput="Search" type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm">
+	<input @bind-value="keyword"
+		   @bind-value:event="oninput"
+		   @onkeyup="async () => await LoadData()"
+		   class="form-control" placeholder="Tìm kiếm..." />
 </div>
 <div>
 	<select class="form-control" value="@role" @onchange="(e) => RoleChanged(e.Value?.ToString())">

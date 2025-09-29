@@ -142,6 +142,32 @@ DELETE FROM users where id = 50
                 address = 'Gia Lai',
                 role = 'technical',
             WHERE id = 43;
-select count(*) from users where phone = and password = 
+select count(*) from users where phone = '0914161844' and password = '123abc456'
 
+ALTER TABLE orderequipments
+DROP COLUMN `name`,
+DROP COLUMN `unit`,
+DROP COLUMN `quantity`;
+CREATE TABLE equipments
+(
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    unit VARCHAR(100),
+    price DECIMAL(18,2),
+    quantity INT,
+    description TEXT
+) CHARACTER SET utf8mb4;
 
+INSERT INTO equipments (name, unit, price, quantity, description)
+VALUES 
+(N'Laptop Dell', N'cái', 15000000, 10, N'Máy tính xách tay Dell Inspiron'),
+(N'Màn hình Samsung', N'cái', 3500000, 20, N'Màn hình LCD 24 inch'),
+(N'Bàn phím Logitech', N'cái', 450000, 50, N'Bàn phím không dây Logitech K380'),
+(N'Ghế văn phòng', N'cái', 1200000, 15, N'Ghế xoay nhân viên'),
+(N'Máy in HP', N'cái', 2500000, 5, N'Máy in laser HP 107w');
+select * from equipments
+
+Select * from orderequipments
+                Select id, name, unit, price, quantity, description
+                from equipments
+                where name LIKE '%%' or id LIKE '%%'

@@ -36,7 +36,12 @@
     <button type="button" class="btn btn-danger me-2" @onclick="RefreshClick">Làm mới</button>
 </EditForm>
 
-<input value="@keyword" @oninput="SearchService" />
+@* <input value="@keyword" @oninput="SearchService" /> *@
+<input @bind-value="keyword"
+       @bind-value:event="oninput"
+       @onkeyup="async () => await LoadData()"
+       class="form-control" placeholder="Tìm kiếm..." />
+
 
 <!-- bảng có sort bằng DataTables -->
 <table id="servicesTable" class="table table-striped table-bordered">
