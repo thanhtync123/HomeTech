@@ -4,11 +4,16 @@ namespace HomeTechBlazor.Model
 {
     public class OrderModel
     {
-        public string IdOrder { get; set; } = "";
+        public int IdOrder { get; set; } = 0;
+
+        public int IdCustomer { get; set; } = 0;
         public string CustomerName { get; set; } = "";
-        public string ServiceId { get; set; } = "";
-        public string TechnicianId { get; set; } = "";
-        public string Status { get; set; } = "pending";
+        public string Phone { get; set; } = "";
+
+        public string Address { get; set; } = "";
+        public int ServiceId { get; set; } = 0;
+        public int TechnicianId { get; set; } = 0;
+        public string Status { get; set; } = "";
         public DateTime AppointmentTime { get; set; } = DateTime.Now;
         public DateTime CreatedDate { get; set; } = DateTime.Now;
         public DateTime? UpdatedDate { get; set; }

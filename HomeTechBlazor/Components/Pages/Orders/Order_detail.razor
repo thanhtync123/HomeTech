@@ -5,25 +5,28 @@
 <EditForm Model="order" OnValidSubmit="HandleValidSubmit">
 	<div class="mb-2">
 		<label>Mã phiếu</label>
-		<InputText @bind-Value="order.IdOrder" class="form-control" />
+		<InputNumber @bind-Value="order.IdOrder" class="form-control" />
 	</div>
-
+	<div class="mb-2">
+		<label>Mã khách hàng</label>
+		<InputNumber @bind-Value="order.IdCustomer" class="form-control" />
+	</div>
 	<div class="mb-2">
 		<label>Tên khách hàng</label>
 		<InputText @bind-Value="order.CustomerName" class="form-control" />
 	</div>
 	<div class="mb-2">
 		<label>SĐT</label>
-		<InputText @bind-Value="order.CustomerName" class="form-control" />
+		<InputText @bind-Value="order.Phone" class="form-control" />
 	</div>
 	<div class="mb-2">
 		<label>Địa chỉ</label>
-		<InputText @bind-Value="order.CustomerName" class="form-control" />
+		<InputText @bind-Value="order.Address" class="form-control" />
 	</div>
 
 	<div class="mb-2">
 		<label>Tên dịch vụ</label>
-		<InputSelect @bind-Value="order.ServiceId" class="form-control" TValue="string">
+		<InputSelect @bind-Value="order.ServiceId" class="form-control" TValue="int">
 			<option value="">-- Chọn dịch vụ --</option>
 			<option value="1">Dịch vụ 1</option>
 			<option value="2">Dịch vụ 2</option>
@@ -32,7 +35,7 @@
 
 	<div class="mb-2">
 		<label>Tên kỹ thuật viên</label>
-		<InputSelect @bind-Value="order.TechnicianId" class="form-control" TValue="string">
+		<InputSelect @bind-Value="order.TechnicianId" class="form-control" TValue="int">
 			<option value="">-- Chọn kỹ thuật viên --</option>
 			<option value="1">Nguyễn Văn A</option>
 			<option value="2">Trần Văn B</option>
@@ -144,13 +147,12 @@
 
 @code {
 	[Parameter] public int id { get; set; }
-
-	private OrderModel order = new()
-	{
-		
-	};
 	private List<Equipments> equipmentList = new();
 	private List<Equipments> equipmentOrderList = new();
+	private List<OrderModel> orderInfor = new();
+	private OrderModel order = new();
+
+
 
 	int totalPrice = 0;
 	string keyword = "";
@@ -162,24 +164,43 @@
 	protected override async Task OnInitializedAsync()
 	{
 		await LoadEquipmentTable();
+
+		var orders = await orderDetailService.getOrderAsync(id);
+		if (orders.Any())
+		{
+			order = orders.First();           
+			equipmentOrderList = order.Items.ToList(); // bind danh sách thiết bị
+		}
+		LoadTotalPrice();
 	}
 	private async Task LoadEquipmentTable()
 	{
 		equipmentList = await orderDetailService.getEquipmentAsync(keyword);
 	}
+	private async Task LoadOrder()
+	{
+//		orderInfor = await orderDetailService.getOrderAsync(29);
+	}
 
 	private void AddItem(int id, string name, string unit, int quantity, int price)
 	{
-		equipmentOrderList.Add(new Equipments
+		var existing = equipmentOrderList.FirstOrDefault(x => x.IdProduct == id);
+		if (existing != null)
+			existing.Quantity += 1;
+		
+		else
 		{
-			IdProduct = id,
-			Name = name,
-			Unit = unit,
-			Quantity = 1,
-			Price = price
-		});
+			equipmentOrderList.Add(new Equipments
+			{
+				IdProduct = id,
+				Name = name,
+				Unit = unit,
+				Quantity = 1,
+				Price = price
+			});
+		}
+
 		LoadTotalPrice();
-		Console.WriteLine($"Đã thêm sản phẩm: {name},{unit},{quantity},{price}");
 	}
 	private void OnQuantityChanged(Equipments item, ChangeEventArgs e)
 	{
