@@ -11,7 +11,7 @@
 <div class="register-page">
     <div class="register-card">
         <div class="register-header">
-            <h2>Đăng Ký Tài Khoản</h2>
+            <h2>Đăng Ký</h2>
             <p>Trải nghiệm dịch vụ tiện ích cùng TECHFIX</p>
         </div>
 
@@ -20,30 +20,30 @@
             <ValidationSummary />
 
             <div class="form-group icon-input">
-                <span class="icon">👤</span>
+                <span class="icon"></span>
                 <InputText @bind-Value="userModel.Name" placeholder="Tên người dùng" class="form-control" />
                 <ValidationMessage For="@(() => userModel.Name)" />
             </div>
 
             <div class="form-group icon-input">
-                <span class="icon">📱</span>
+                <span class="icon"></span>
                 <InputText @bind-Value="userModel.Phone" placeholder="Số điện thoại" class="form-control" />
                 <ValidationMessage For="@(() => userModel.Phone)" />
             </div>
 
             <div class="form-group icon-input">
-                <span class="icon">🔒</span>
+                <span class="icon"></span>
                 <InputText @bind-Value="userModel.Password" type="password" placeholder="Mật khẩu" class="form-control" />
                 <ValidationMessage For="@(() => userModel.Password)" />
             </div>
 
             <div class="form-group icon-input">
-                <span class="icon">📍</span>
+                <span class="icon"></span>
                 <InputTextArea @bind-Value="userModel.Address" placeholder="Địa chỉ" class="form-control" />
                 <ValidationMessage For="@(() => userModel.Address)" />
             </div>
 
-            <button type="submit" class="btn-register">🚀 Đăng Ký Ngay</button>
+            <button type="submit" class="btn-register">Đăng Ký Ngay</button>
         </EditForm>
     </div>
 </div>

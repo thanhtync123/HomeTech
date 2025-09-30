@@ -10,32 +10,41 @@
 </HeadContent>
 
 <div class="login-page">
-    <div class="login-card">
-        <div class="login-header">
-            <h2>Đăng Nhập</h2>
-            <p>Chào mừng quay lại với TECHFIX</p>
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <h2>Đăng Nhập</h2>
+                <p>Chào mừng bạn đến với TECHFIX</p>
+            </div>
+
+            <EditForm Model="@loginModel" FormName="form_login" OnValidSubmit="OnValidSubmit" class="login-form">
+                <DataAnnotationsValidator />
+
+                <div class="form-group icon-input">
+                    <span class="icon"></span>
+                    <InputText @bind-Value="loginModel.Phone" placeholder="Số điện thoại" class="form-control" />
+                    <ValidationMessage For="@(() => loginModel.Phone)" />
+                </div>
+
+                <div class="form-group icon-input">
+                    <span class="icon"></span>
+                    <InputText type="password" @bind-Value="loginModel.Password" placeholder="Mật khẩu" class="form-control" />
+                    <ValidationMessage For="@(() => loginModel.Password)" />
+                </div>
+
+                <button type="submit" class="btn-login"> Đăng Nhập</button>
+            </EditForm>
+
+            <div class="register-link">
+                <p>Chưa có tài khoản? <a href="/register">Đăng ký ngay</a></p>
+            </div>
         </div>
-
-        <EditForm Model="@loginModel" FormName="form_login" OnValidSubmit="OnValidSubmit" class="login-form">
-            <DataAnnotationsValidator />
-
-            <div class="form-group icon-input">
-                <span class="icon">📱</span>
-                <InputText @bind-Value="loginModel.Phone" placeholder="Số điện thoại" class="form-control" />
-                <ValidationMessage For="@(() => loginModel.Phone)" />
+        <div class="company-info">
+            <img src="images/logo.png" alt="Techfix Logo" class="company-logo" />
+            <div class="company-description">
+                <h3>Về TECHFIX</h3>
+                <p>TECHFIX là web trong lĩnh vực kỹ thuật & công nghệ, cung cấp các giải pháp sáng tạo và dịch vụ sửa chữa chất lượng cao. Chúng tôi cam kết mang đến trải nghiệm tốt nhất cho khách hàng.</p>
             </div>
-
-            <div class="form-group icon-input">
-                <span class="icon">🔒</span>
-                <InputText type="password" @bind-Value="loginModel.Password" placeholder="Mật khẩu" class="form-control" />
-                <ValidationMessage For="@(() => loginModel.Password)" />
-            </div>
-
-            <button type="submit" class="btn-login">🚀 Đăng Nhập</button>
-        </EditForm>
-
-        <div class="register-link">
-            <p>Chưa có tài khoản? <a href="/register">Đăng ký ngay</a></p>
         </div>
     </div>
 </div>
