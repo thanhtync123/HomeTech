@@ -1,7 +1,140 @@
 ﻿@page "/home"
 @inherits HomeTechBlazor.Components.Shared.AdminPageBase
-<PageTitle>Home</PageTitle>
+@inject NavigationManager NavigationManager
+@inject HomeTechBlazor.Components.Shared.CurrentUser CurrentUser
 
-<h1>Hello, world!</h1>
+<PageTitle>Admin Dashboard</PageTitle>
 
-Welcome to your new app.
+<HeadContent>
+    <link href="css/home.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/home.js"></script>
+</HeadContent>
+
+<div class="dashboard-wrapper">
+    <!-- Header -->
+    <header class="dashboard-header">
+        <div class="container flex justify-between items-center">
+            <h1>🏠 TECHFIX Admin</h1>
+            <nav class="nav-links flex items-center space-x-4">
+                @if (!string.IsNullOrEmpty(CurrentUser.name))
+                {
+                    <span class="welcome"> | Welcome, <b>@CurrentUser.name</b></span>
+                    <a class="logout" href="/logout">Logout</a>
+                }
+                else
+                {
+                    <a href="/login">Login</a>
+                }
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Dashboard -->
+    <main class="dashboard-main container">
+        <h2 class="section-title">📊 TRANG CHỦ</h2>
+
+        <!-- Summary Cards -->
+        <div class="stats-cards">
+            <div class="card bg-blue">
+                <h3>Thiết bị hoạt động</h3>
+                <p class="value">142</p>
+                <p class="sub">+5% từ tháng trước</p>
+            </div>
+            <div class="card bg-green">
+                <h3>Tổng người dùng</h3>
+                <p class="value">89</p>
+                <p class="sub">+3 người dùng mới</p>
+            </div>
+            <div class="card bg-yellow">
+                <h3>Thông báo hệ thống</h3>
+                <p class="value">3</p>
+                <p class="sub">Xem chi tiết</p>
+            </div>
+            <div class="card bg-purple">
+                <h3>Revenue (This Month)</h3>
+                <p class="value">12,540,000</p>
+                <p class="sub">+12% so với tháng trước</p>
+            </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="charts">
+            <div class="chart-box">
+                <h3>Device Activity (Last 7 Days)</h3>
+                <canvas id="deviceActivityChart"></canvas>
+            </div>
+            <div class="chart-box">
+                <h3>Orders by Status</h3>
+                <canvas id="ordersChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Recent Activity Table -->
+        <div class="recent-orders">
+            <h3>Recent Activity</h3>
+            <table class="orders-table">
+                <thead>
+                    <tr>
+                        <th>Device</th>
+                        <th>Action</th>
+                        <th>User</th>
+                        <th>Time</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Smart Light</td>
+                        <td>Turned On</td>
+                        <td>@CurrentUser.name</td>
+                        <td>10:30 AM</td>
+                        <td><span class="status success">Success</span></td>
+                    </tr>
+                    <tr>
+                        <td>Thermostat</td>
+                        <td>Temperature Adjusted</td>
+                        <td>John Doe</td>
+                        <td>9:15 AM</td>
+                        <td><span class="status pending">Pending</span></td>
+                    </tr>
+                    <tr>
+                        <td>Security Camera</td>
+                        <td>Motion Detected</td>
+                        <td>System</td>
+                        <td>8:45 AM</td>
+                        <td><span class="status warning">Alert</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="dashboard-footer">
+        <div class="container text-center">
+            <p>&copy; @DateTime.Now.Year HomeTech. All rights reserved.</p>
+            <div class="footer-links">
+                <a href="/about">About</a>
+                <a href="/contact">Contact</a>
+                <a href="/privacy">Privacy Policy</a>
+            </div>
+        </div>
+    </footer>
+</div>
+
+@code {
+    protected override void OnInitialized()
+    {
+        if (CurrentUser.name == string.Empty)
+        {
+            NavigationManager.NavigateTo("/login");
+            return;
+        }
+
+        if (CurrentUser.role == "customer")
+        {
+            NavigationManager.NavigateTo("/?error=forbidden");
+        }
+    }
+}
