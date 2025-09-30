@@ -9,7 +9,25 @@
     <link href="css/login.css" rel="stylesheet" />
 </HeadContent>
 
+<style>
+    body {
+        overflow: hidden; /* Disable body scrolling */
+        margin: 0;
+        height: 100vh; /* Ensure body takes full viewport height */
+    }
+
+    html {
+        height: 100%; /* Ensure html takes full height to support body */
+    }
+</style>
+
 <div class="login-page">
+    <div class="particles">
+        @for (int i = 0; i < 30; i++)
+        {
+            <div class="particle" style="left: @(new Random().Next(0, 100))%; top: @(new Random().Next(0, 100))%; animation-delay: @(new Random().NextDouble() * 15)s;"></div>
+        }
+    </div>
     <div class="login-container">
         <div class="login-card">
             <div class="login-header">
@@ -32,7 +50,7 @@
                     <ValidationMessage For="@(() => loginModel.Password)" />
                 </div>
 
-                <button type="submit" class="btn-login"> Đăng Nhập</button>
+                <button type="submit" class="btn-login">Đăng Nhập</button>
             </EditForm>
 
             <div class="register-link">

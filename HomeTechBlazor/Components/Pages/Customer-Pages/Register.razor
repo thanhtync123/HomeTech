@@ -8,7 +8,25 @@
     <link href="css/register.css" rel="stylesheet" />
 </HeadContent>
 
+<style>
+    body {
+        overflow: hidden; /* Disable body scrolling */
+        margin: 0;
+        height: 100vh; /* Ensure body takes full viewport height */
+    }
+
+    html {
+        height: 100%; /* Ensure html takes full height to support body */
+    }
+</style>
+
 <div class="register-page">
+    <div class="particles">
+        @for (int i = 0; i < 30; i++)
+        {
+            <div class="particle" style="left: @(new Random().Next(0, 100))%; top: @(new Random().Next(0, 100))%; animation-delay: @(new Random().NextDouble() * 15)s;"></div>
+        }
+    </div>
     <div class="register-card">
         <div class="register-header">
             <h2>Đăng Ký</h2>
@@ -39,7 +57,7 @@
 
             <div class="form-group icon-input">
                 <span class="icon"></span>
-                <InputTextArea @bind-Value="userModel.Address" placeholder="Địa chỉ" class="form-control" />
+                <InputTextArea @bind-Value="userModel.Address" placeholder="Địa chỉ" class="form-control" style="max-height: 100px; overflow-y: auto;" />
                 <ValidationMessage For="@(() => userModel.Address)" />
             </div>
 
@@ -70,7 +88,7 @@
         catch (Exception e)
         {
             // if (e.Message == $"Duplicate entry '{userModel.Phone}' for key 'users.phone'")
-                toastComponent.ShowError("Tài khoản đã tồn tại, vui lòng chọn tài khoản khác");
+            toastComponent.ShowError("Tài khoản đã tồn tại, vui lòng chọn tài khoản khác");
             Console.Write(e.ToString);
         }
     }
