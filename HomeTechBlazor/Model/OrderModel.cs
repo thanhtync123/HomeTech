@@ -14,8 +14,10 @@ namespace HomeTechBlazor.Model
         public int ServiceId { get; set; } = 0;
         public int TechnicianId { get; set; } = 0;
         public string Status { get; set; } = "";
-        public DateTime AppointmentTime { get; set; } = DateTime.Now;
-        public DateTime CreatedDate { get; set; } = DateTime.Now;
+
+        public int? totalPrice { get; set; } = 0;
+        public DateTime? AppointmentTime { get; set; } = DateTime.Now;
+        public DateTime? CreatedDate { get; set; } = DateTime.Now;
         public DateTime? UpdatedDate { get; set; }
         public List<Equipments>? Items { get; set; } = new();
     }
