@@ -5,37 +5,46 @@
 <EditForm Model="order" OnValidSubmit="HandleValidSubmit">
 	<div class="mb-2">
 		<label>Mã phiếu</label>
-		<InputText @bind-Value="order.IdOrder" class="form-control" />
+		<InputNumber @bind-Value="order.IdOrder" class="form-control" readonly />
 	</div>
-
+	<div class="mb-2">
+		<label>Mã khách hàng</label>
+		<InputNumber @bind-Value="order.IdCustomer" class="form-control" readonly />
+	</div>
 	<div class="mb-2">
 		<label>Tên khách hàng</label>
-		<InputText @bind-Value="order.CustomerName" class="form-control" />
+		<InputText @bind-Value="order.CustomerName" class="form-control" readonly />
 	</div>
 	<div class="mb-2">
 		<label>SĐT</label>
-		<InputText @bind-Value="order.CustomerName" class="form-control" />
+		<InputText @bind-Value="order.Phone" class="form-control" readonly />
 	</div>
 	<div class="mb-2">
 		<label>Địa chỉ</label>
-		<InputText @bind-Value="order.CustomerName" class="form-control" />
+		<InputText @bind-Value="order.Address" class="form-control" readonly />
 	</div>
 
 	<div class="mb-2">
 		<label>Tên dịch vụ</label>
-		<InputSelect @bind-Value="order.ServiceId" class="form-control" TValue="string">
-			<option value="">-- Chọn dịch vụ --</option>
-			<option value="1">Dịch vụ 1</option>
-			<option value="2">Dịch vụ 2</option>
+		<InputSelect @bind-Value="order.ServiceId" @bind-Value:after="LoadTotalPrice" class="form-control" TValue="int">
+			<option value="0">-- Chọn dịch vụ --</option>
+			@foreach (var kv in serviceDict)
+			{
+				<option value="@kv.Key">@kv.Value.Item1:@kv.Value.Item2.ToString("N0")</option>
+			}
 		</InputSelect>
+
+
 	</div>
 
 	<div class="mb-2">
 		<label>Tên kỹ thuật viên</label>
-		<InputSelect @bind-Value="order.TechnicianId" class="form-control" TValue="string">
-			<option value="">-- Chọn kỹ thuật viên --</option>
-			<option value="1">Nguyễn Văn A</option>
-			<option value="2">Trần Văn B</option>
+		<InputSelect @bind-Value="order.TechnicianId" class="form-control" TValue="int">
+			<option value="0">-- Chọn kỹ thuật viên --</option>
+			@foreach (var kv in technicalDict)
+			{
+				<option value="@kv.Key">@kv.Value</option>
+			}
 		</InputSelect>
 	</div>
 
@@ -43,8 +52,8 @@
 		<label>Trạng thái</label>
 		<InputSelect @bind-Value="order.Status" class="form-control" TValue="string">
 			<option value="pending">Chờ xử lý</option>
-			<option value="inprogress">Đang xử lý</option>
-			<option value="done">Hoàn thành</option>
+			<option value="completed">Hoàn thành</option>
+			<option value="cancelled">Đã hủy</option>
 		</InputSelect>
 	</div>
 
@@ -53,15 +62,8 @@
 		<InputDate @bind-Value="order.AppointmentTime" class="form-control" />
 	</div>
 
-	<div class="mb-2">
-		<label>Ngày tạo</label>
-		<InputDate @bind-Value="order.CreatedDate" class="form-control" disabled />
-	</div>
-
-	<div class="mb-2">
-		<label>Ngày cập nhật</label>
-		<InputDate @bind-Value="order.UpdatedDate" class="form-control" disabled />
-	</div>
+	<p>Ngày tạo đơn: @order.CreatedDate</p>
+	<p>Ngày cập nhật: @order.UpdatedDate</p>
 
 	<h5 class="mt-3">Danh sách mặt hàng</h5>
 	<table class="table table-bordered">
@@ -73,9 +75,11 @@
 				<th>Đơn vị</th>
 				<th>Đơn giá</th>
 				<th>Tổng tiền</th>
+				<th>Xóa</th>
 			</tr>
 		</thead>
 		<tbody>
+
 			@foreach (var item in equipmentOrderList)
 			{
 				<tr>
@@ -89,15 +93,27 @@
 					<td>
 						<p>@( (item.Quantity * item.Price).ToString("N0") )</p>
 					</td>
-
-
+					<td>
+						<button class="btn btn-sm btn-primary"
+								@onclick="(() => RemoveItem(item.IdProduct))">
+							-
+						</button>
+					</td>
 				</tr>
 			}
 		</tbody>
 	</table>
 
 	<div class="mt-2">
-		<strong>Tổng tiền: @totalPrice.ToString("N0")</strong>
+		<strong>
+			<p>
+				Phí dịch vụ:
+				@servicePrice
+			</p>
+		</strong>
+		<strong>Tiền sản phẩm: @equipsPrice.ToString("N0")</strong>
+		<strong>Tổng cộng: @totalprice.ToString("N0")</strong>
+
 	</div>
 
 	<button type="submit" class="btn btn-primary mt-3">Lưu phiếu</button>
@@ -144,42 +160,85 @@
 
 @code {
 	[Parameter] public int id { get; set; }
-
-	private OrderModel order = new()
-	{
-		
-	};
 	private List<Equipments> equipmentList = new();
 	private List<Equipments> equipmentOrderList = new();
+	private List<OrderModel> orderInfor = new();
+	private OrderModel order = new();
+	private Dictionary<int, string> technicalDict = new();
+	private Dictionary<int, (string, int)> serviceDict = new();
 
-	int totalPrice = 0;
+
+
+	int equipsPrice = 0;
+	int servicePrice = 12;
+	int totalprice = 0;
+
 	string keyword = "";
-	private void HandleValidSubmit()
+
+	private async Task HandleValidSubmit()
 	{
 
-
+		order.totalPrice = equipsPrice + servicePrice;
+		order.Items = equipmentOrderList;
+		await orderDetailService.SaveOrderExamSync(order);
 	}
+
 	protected override async Task OnInitializedAsync()
 	{
+		technicalDict = await orderDetailService.getTechnicalSelect();
+		serviceDict = await orderDetailService.getServiceSelect();
 		await LoadEquipmentTable();
+
+		var orders = await orderDetailService.getOrderAsync(id);
+		if (orders.Any())
+		{
+			order = orders.First();
+			equipmentOrderList = order.Items.ToList();
+		}
+		LoadTotalPrice();
 	}
 	private async Task LoadEquipmentTable()
 	{
 		equipmentList = await orderDetailService.getEquipmentAsync(keyword);
 	}
+	private void RemoveItem(int id)
+	{
+		try
+		{
+			var item = equipmentOrderList.FirstOrDefault(x => x.IdProduct == id);
+			if (item != null)
+			{
+				equipmentOrderList.Remove(item);
+				LoadTotalPrice();
+			}
+		}
+		catch(Exception e)
+		{
+			Console.WriteLine("Loi" + e.ToString);
+		}
+
+	}
+
 
 	private void AddItem(int id, string name, string unit, int quantity, int price)
 	{
-		equipmentOrderList.Add(new Equipments
+		var existing = equipmentOrderList.FirstOrDefault(x => x.IdProduct == id);
+		if (existing != null)
+			existing.Quantity += 1;
+
+		else
 		{
-			IdProduct = id,
-			Name = name,
-			Unit = unit,
-			Quantity = 1,
-			Price = price
-		});
+			equipmentOrderList.Add(new Equipments
+			{
+				IdProduct = id,
+				Name = name,
+				Unit = unit,
+				Quantity = 1,
+				Price = price
+			});
+		}
+
 		LoadTotalPrice();
-		Console.WriteLine($"Đã thêm sản phẩm: {name},{unit},{quantity},{price}");
 	}
 	private void OnQuantityChanged(Equipments item, ChangeEventArgs e)
 	{
@@ -191,10 +250,18 @@
 	}
 	private void LoadTotalPrice()
 	{
-		totalPrice = 0;
-		foreach (var item in equipmentOrderList)
-			totalPrice += item.Quantity * item.Price;
+		equipsPrice = equipmentOrderList.Sum(x => x.Quantity * x.Price);
+
+		if (order.ServiceId != 0 && serviceDict.ContainsKey(order.ServiceId))
+			servicePrice = serviceDict[order.ServiceId].Item2;
+		else
+			servicePrice = 0;
+
+		totalprice = equipsPrice + servicePrice;
 	}
+
+
+
 
 
 
