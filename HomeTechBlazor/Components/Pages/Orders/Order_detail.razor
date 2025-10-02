@@ -177,15 +177,9 @@
 
 	private async Task HandleValidSubmit()
 	{
-		// int serviceFee = serviceDict.ContainsKey(order.ServiceId) ? serviceDict[order.ServiceId].Item2 : 0;
+
 		order.totalPrice = equipsPrice + servicePrice;
-		Console.WriteLine("===== DEBUG FORM SUBMIT =====");
-		Console.WriteLine($"orderId: {order.IdOrder}");
-		Console.WriteLine($"ServiceId: {order.ServiceId}");
-		Console.WriteLine($"TechnicianId: {order.TechnicianId}");
-		Console.WriteLine($"Status: {order.Status}");
-		Console.WriteLine($"AppointmentTime: {order.AppointmentTime}");
-		Console.WriteLine($"TotalPrice: {order.totalPrice}");
+		order.Items = equipmentOrderList;
 		await orderDetailService.SaveOrderExamSync(order);
 	}
 
@@ -209,12 +203,20 @@
 	}
 	private void RemoveItem(int id)
 	{
-		var item = equipmentOrderList.FirstOrDefault(x => x.IdProduct == id);
-		if (item != null)
+		try
 		{
-			equipmentOrderList.Remove(item);
-			LoadTotalPrice();
+			var item = equipmentOrderList.FirstOrDefault(x => x.IdProduct == id);
+			if (item != null)
+			{
+				equipmentOrderList.Remove(item);
+				LoadTotalPrice();
+			}
 		}
+		catch(Exception e)
+		{
+			Console.WriteLine("Loi" + e.ToString);
+		}
+
 	}
 
 

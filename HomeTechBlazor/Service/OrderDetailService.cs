@@ -49,9 +49,9 @@ namespace HomeTechBlazor.Service
           c.phone as Phone,
           c.address as Address,
           o.service_id as ServiceId,
+          e.id as EquipmentId, 
           t.id as Technical_id,
           o.status as status,
-          oe.id as equipmentId,
           oe.quantity as quantity,
           e.unit,
           e.price,
@@ -96,7 +96,7 @@ namespace HomeTechBlazor.Service
                 {
                     order.Items.Add(new Equipments
                     {
-                        IdProduct = reader.GetInt16("equipmentId"),
+                        IdProduct = reader.GetInt16("EquipmentId"),
                         Name = reader.GetString("equipment_name"),
                         Quantity = reader.GetInt16("quantity"),
                         Unit = reader.GetString("unit"),
@@ -163,9 +163,24 @@ namespace HomeTechBlazor.Service
                     total_price = {om.totalPrice} 
                 where id = {om.IdOrder}
                         ";
-            Console.Write("sua ne " + sql);
             var cmd = new MySqlCommand(sql, conn);
             await cmd.ExecuteNonQueryAsync();
+
+
+            sql = $"DELETE FROM orderequipments WHERE order_id = {om.IdOrder}";
+            Console.WriteLine("del sql" + sql);
+            cmd = new MySqlCommand(sql, conn);
+            await cmd.ExecuteNonQueryAsync();
+            foreach (var item in om.Items)
+            {
+                sql = $@"
+                     INSERT INTO orderequipments(order_id, equipment_id, quantity) VALUE ({om.IdOrder}, {item.IdProduct},{item.Quantity})
+                    ";
+                Console.WriteLine("insert sql"+sql );
+                cmd = new MySqlCommand(sql, conn);
+                await cmd.ExecuteNonQueryAsync();
+            }    
+
         }
 
 
