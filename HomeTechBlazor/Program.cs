@@ -17,6 +17,7 @@ builder.Services.AddScoped<OrderDetailService>();
 
 builder.Services.AddSingleton<CurrentUser>();
 builder.Services.AddMudServices();
+builder.Services.AddScoped<HomeTechBlazor.Managers.ChatbotManager>();
 
 // Cho phép tải file lớn
 builder.WebHost.ConfigureKestrel(options =>

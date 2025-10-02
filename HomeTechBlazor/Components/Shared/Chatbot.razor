@@ -1,0 +1,32 @@
+﻿@inject HomeTechBlazor.Managers.ChatbotManager ChatbotManager
+
+<div class="chatbot">
+    <div class="chatbot-header">🤖 Chatbot</div>
+    <div class="chatbot-messages">
+        @foreach (var msg in messages)
+        {
+            <div class="@msg.CssClass">@msg.Text</div>
+        }
+    </div>
+    <div class="chatbot-input">
+        <input @bind="userInput" @bind:event="oninput" placeholder="Nhập câu hỏi..." />
+        <button @onclick="SendMessage">Gửi</button>
+    </div>
+</div>
+
+@code {
+    private string userInput = string.Empty;
+
+    private List<(string Text, string CssClass)> messages = new();
+
+    private async Task SendMessage()
+    {
+        if (string.IsNullOrWhiteSpace(userInput)) return;
+
+        messages.Add((userInput, "user-msg"));
+        var reply = await ChatbotManager.AskAsync(userInput);
+        messages.Add((reply, "bot-msg"));
+
+        userInput = string.Empty;
+    }
+}
