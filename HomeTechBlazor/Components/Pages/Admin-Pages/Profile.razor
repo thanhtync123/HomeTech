@@ -3,6 +3,7 @@
 @rendermode InteractiveServer
 @using Microsoft.AspNetCore.Components.Forms
 @inject CurrentUser currentUser
+@inject UserService userService
 
 <HeadContent>
     <link href="css/profile.css" rel="stylesheet" />
@@ -36,13 +37,11 @@
             @* <p class="phone-tag">📱 @userModel.Phone</p> *@
         </div>
 
-        <!-- Cột phải: Form -->
         <div class="profile-right">
             <h2 class="form-title">Cập nhật thông tin</h2>
             <EditForm Model="@userModel" OnValidSubmit="HandleValidSubmit" class="profile-form">
                 <DataAnnotationsValidator />
                 <ValidationSummary />
-
                 <div class="form-group icon-input">
                     <span class="icon">👤</span>
                     <InputText @bind-Value="userModel.Name" class="form-control" placeholder="Tên người dùng" />
@@ -80,12 +79,14 @@
 
     protected override void OnInitialized()
     {
-        // dùng property chữ thường theo class CurrentUser của bạn
+
+        userModel.Id = currentUser.id;
         userModel.Name = currentUser.name ?? "Người dùng";
         userModel.Phone = currentUser.phone ?? "";
         userModel.Password = currentUser.password ?? "";
         userModel.Address = currentUser.address ?? "";
         userModel.Role = currentUser.role ?? "customer";
+
     }
 
     private string GetInitial()
@@ -107,9 +108,16 @@
         avatarBase64 = $"data:{file.ContentType};base64,{Convert.ToBase64String(bytes)}";
     }
 
-    private Task HandleValidSubmit()
+    private async Task HandleValidSubmit()
     {
-        Console.WriteLine("Lưu profile");
-        return Task.CompletedTask;
+        Console.WriteLine("ID ACC:"+currentUser.id);
+        await userService.UpdateSync(userModel);
+        currentUser.address = userModel.Address;
+        currentUser.name = userModel.Name;
+        currentUser.phone = userModel.Phone;
+        currentUser.password = userModel.Password;
+        currentUser.id = userModel.Id;
+
+
     }
 }

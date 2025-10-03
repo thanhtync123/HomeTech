@@ -57,7 +57,7 @@
 	<button class="btn btn-outline-secondary" @onclick="DownPage"> Giảm </button>
 	<button class="btn btn-outline-secondary" @onclick="UpPage"> Tăng </button>
 </p>
-@* //<button class="btn btn-outline-secondary" @onclick="UpdateStatus"> Test cập nhật trạng thái </button> *@
+<button class="btn btn-outline-secondary"> Tạo mới phiếu </button>
 <p>@a</p>
 <p>@msg</p>
 
@@ -132,7 +132,7 @@
 				};
 			await orderService.UpdateStatusSync(orders);
 			await LoadData();
-			msg = "Sửa thành công";
+			
 		}
 		catch (Exception e)
 		{

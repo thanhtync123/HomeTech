@@ -10,7 +10,7 @@ namespace HomeTechBlazor.Service
         {
             await using var conn = await GetOpenConnectionAsync();
             string sql = @$"
-                 select role,name,phone,address,password 
+                 select role,name,phone,address,password,id 
                 from users 
                 where phone = '{username}' and password = '{password}'
                 limit 1
@@ -24,8 +24,10 @@ namespace HomeTechBlazor.Service
                 var phone = reader.GetString("phone");
                 var address = reader.GetString("address");
                 var dbPassword = reader.GetString("password");
+                var id = reader.GetInt16("id");
                 return System.Text.Json.JsonSerializer.Serialize(new
                 {
+                    id = id.ToString(),
                     role,
                     name,
                     phone,

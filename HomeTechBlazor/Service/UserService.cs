@@ -94,7 +94,7 @@ namespace HomeTechBlazor.Service
             WHERE id = {u.Id};
 
             ";
-            Console.WriteLine("Tsadfjk" + sql);
+            Console.WriteLine("Update" + sql);
             var cmd = new MySqlCommand(sql, conn);
             await cmd.ExecuteNonQueryAsync();
 
@@ -111,6 +111,7 @@ namespace HomeTechBlazor.Service
             await cmd.ExecuteNonQueryAsync();
 
         }
+      
 
     }
 }

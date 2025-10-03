@@ -72,7 +72,7 @@
 @code {
     private Toast toastComponent;
     private HomeTechBlazor.Model.LoginModel loginModel = new();
-    private void setCurrentUser(string role, string phone, string name, string address, string password)
+    private void setCurrentUser(string role, string phone, string name, string address, string password,string id)
     {
         CurrentUser.role = role;
         CurrentUser.phone = phone;
@@ -80,6 +80,7 @@
         CurrentUser.address = address;
         CurrentUser.isLoggedIn = true;
         CurrentUser.password = password;
+        CurrentUser.id = Convert.ToInt16(id);
     }
     private async Task OnValidSubmit()
     {
@@ -88,7 +89,7 @@
             var json = await loginService.LoginAsync(loginModel.Phone, loginModel.Password);
             if (json == null) { toastComponent.ShowError("Sai tài khoản hoặc mật khẩu"); return; }
             var user = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, string>>(json)!;
-            setCurrentUser(user["role"], user["phone"], user["name"], user["address"], user["dbPassword"]);
+            setCurrentUser(user["role"], user["phone"], user["name"], user["address"], user["dbPassword"],user["id"]);
             NavigationManager.NavigateTo(user["role"] == "admin" ? "/home" : "/");
         }
         catch (Exception e)

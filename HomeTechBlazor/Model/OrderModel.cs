@@ -1,5 +1,5 @@
 ﻿using HomeTechBlazor.Model;
-using static HomeTechBlazor.Components.Pages.Orders.Order_detail;
+//using static HomeTechBlazor.Components.Pages.Order_detail;
 namespace HomeTechBlazor.Model
 {
     public class OrderModel
