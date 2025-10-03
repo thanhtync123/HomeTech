@@ -183,6 +183,70 @@ namespace HomeTechBlazor.Service
 
         }
 
+        public async Task<List<Users>> getCustomerAsync()
+        {
+            await using var conn = await GetOpenConnectionAsync();
+            var list = new List<Users>();
+            //id, name, phone, password, address, role, created_at, updated_at
+            string sql = @$"
+                select * from users where role = 'customer'
+            ";
+            var cmd = new MySqlCommand(sql, conn);
+            await using var reader = await cmd.ExecuteReaderAsync();
+            while (await reader.ReadAsync())
+            {
+                list.Add(new Users
+                {
+                    Id = reader.GetInt32("id"),
+                    Name = reader.GetString("name"),
+                    Phone = reader.GetString("phone"),
+                    Address = reader.GetString("address")
+                });
+            }
+            Console.Write(sql);
+            return list;
+
+
+        }
+        public async Task<int> getMaxOrderId()
+        {
+            await using var conn = await GetOpenConnectionAsync();
+            int id=0;
+            string sql = @$"
+                select id from orders order by id desc limit 1
+            ";
+            var cmd = new MySqlCommand(sql, conn);
+            await using var reader = await cmd.ExecuteReaderAsync();
+            while (await reader.ReadAsync())
+            {
+                id = reader.GetInt16(id);
+            }
+            return id;
+        }
+        public async Task CreateOrderExamSync(OrderModel om)
+        {
+            await using var conn = await GetOpenConnectionAsync();
+            // id, customer_id, service_id, technician_id, schedule_time, status, total_price, created_at, updated_at
+            string sql = $@"
+    insert into orders (customer_id, service_id, technician_id, schedule_time, status, total_price)
+    values ({om.IdCustomer},{om.ServiceId},{om.TechnicianId},'{om.AppointmentTime?.ToString("yyyy-MM-dd HH:mm:ss")}','{om.Status}',{om.totalPrice})
+                ";
+            var cmd = new MySqlCommand(sql, conn);
+            Console.WriteLine("insert sql orders" + sql);
+            await cmd.ExecuteNonQueryAsync();
+
+            foreach (var item in om.Items)
+            {
+                sql = $@"
+                     INSERT INTO orderequipments(order_id, equipment_id, quantity) VALUE ({om.IdOrder}, {item.IdProduct},{item.Quantity})
+                    ";
+
+
+                Console.WriteLine("insert sql orderequipments" + sql);
+                cmd = new MySqlCommand(sql, conn);
+                await cmd.ExecuteNonQueryAsync();
+            }
+        }
 
 
     }
