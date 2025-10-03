@@ -1,67 +1,53 @@
-﻿.chatbot {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    width: 300px;
-    background: white;
-    border: 1px solid #ccc;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    font-family: sans-serif;
+﻿.chatbot-container {
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    width: 400px;
+    height: 500px;
     display: flex;
     flex-direction: column;
+    background: #fff;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    margin: 20px auto; /* nằm giữa trang */
 }
 
-.chatbot-header {
-    background: #0078d7;
-    color: white;
-    padding: 10px;
-    border-radius: 12px 12px 0 0;
-    font-weight: bold;
-}
-
-.chatbot-messages {
+.chat-window {
     flex: 1;
-    padding: 10px;
     overflow-y: auto;
-    max-height: 200px;
+    padding: 10px;
+    background: #f9f9f9;
 }
 
-.user-msg {
-    text-align: right;
-    margin: 5px;
-    color: white;
-    background: #0078d7;
-    padding: 6px 10px;
-    border-radius: 8px;
-    display: inline-block;
+.msg {
+    margin: 5px 0;
+    padding: 8px 12px;
+    border-radius: 6px;
+    max-width: 80%;
 }
 
-.bot-msg {
-    text-align: left;
-    margin: 5px;
-    background: #eee;
-    padding: 6px 10px;
-    border-radius: 8px;
-    display: inline-block;
-}
-
-.chatbot-input {
-    display: flex;
-    border-top: 1px solid #ccc;
-}
-
-    .chatbot-input input {
-        flex: 1;
-        border: none;
-        padding: 8px;
-        outline: none;
+    .msg.user {
+        background: #007bff;
+        color: white;
+        align-self: flex-end;
+        text-align: right;
     }
 
-    .chatbot-input button {
-        background: #0078d7;
-        color: white;
-        border: none;
-        padding: 8px 12px;
-        cursor: pointer;
+    .msg.bot {
+        background: #e5e5ea;
+        color: black;
+        align-self: flex-start;
+        text-align: left;
+    }
+
+.chat-input {
+    display: flex;
+    padding: 10px;
+    border-top: 1px solid #ddd;
+    background: white;
+}
+
+    .chat-input textarea {
+        flex: 1;
+        margin-right: 10px;
+        resize: none;
+        padding: 5px;
     }

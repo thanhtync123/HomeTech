@@ -1,32 +1,72 @@
-﻿@inject HomeTechBlazor.Managers.ChatbotManager ChatbotManager
+﻿@inject HttpClient Http
 
-<div class="chatbot">
-    <div class="chatbot-header">🤖 Chatbot</div>
-    <div class="chatbot-messages">
+<div class="chatbot-container">
+    <h4>🤖 Chatbot GitHub Models</h4>
+
+    <div class="chat-window">
         @foreach (var msg in messages)
         {
-            <div class="@msg.CssClass">@msg.Text</div>
+            <div class="@(msg.Role == "user" ? "msg user" : "msg bot")">
+                <b>@msg.Role:</b> @msg.Content
+            </div>
         }
     </div>
-    <div class="chatbot-input">
-        <input @bind="userInput" @bind:event="oninput" placeholder="Nhập câu hỏi..." />
-        <button @onclick="SendMessage">Gửi</button>
+
+    <div class="chat-input">
+        <textarea @bind="userMessage" rows="2" placeholder="Nhập câu hỏi..."></textarea>
+        <button class="btn btn-primary" @onclick="SendMessage">Gửi</button>
     </div>
 </div>
 
 @code {
-    private string userInput = string.Empty;
-
-    private List<(string Text, string CssClass)> messages = new();
+    private string userMessage = "";
+    private List<ChatMessage> messages = new();
 
     private async Task SendMessage()
     {
-        if (string.IsNullOrWhiteSpace(userInput)) return;
+        if (string.IsNullOrWhiteSpace(userMessage))
+            return;
 
-        messages.Add((userInput, "user-msg"));
-        var reply = await ChatbotManager.AskAsync(userInput);
-        messages.Add((reply, "bot-msg"));
+        // Hiển thị tin nhắn của user
+        messages.Add(new ChatMessage { Role = "user", Content = userMessage });
 
-        userInput = string.Empty;
+        var requestData = new
+        {
+            model = "openai/gpt-4.1-mini",
+            messages = messages.Select(m => new { role = m.Role, content = m.Content }).ToArray()
+        };
+
+        using var req = new HttpRequestMessage(HttpMethod.Post, "https://models.github.ai/inference/chat/completions");
+        req.Headers.Add("Authorization", "Bearer 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");
+        req.Headers.Add("Accept", "application/vnd.github+json");
+        req.Content = new StringContent(System.Text.Json.JsonSerializer.Serialize(requestData),
+                                        System.Text.Encoding.UTF8, "application/json");
+
+        var res = await Http.SendAsync(req);
+        var body = await res.Content.ReadAsStringAsync();
+
+        try
+        {
+            using var doc = System.Text.Json.JsonDocument.Parse(body);
+            var aiReply = doc.RootElement
+                .GetProperty("choices")[0]
+                .GetProperty("message")
+                .GetProperty("content")
+                .GetString();
+
+            messages.Add(new ChatMessage { Role = "assistant", Content = aiReply });
+        }
+        catch
+        {
+            messages.Add(new ChatMessage { Role = "assistant", Content = "⚠️ Lỗi: " + body });
+        }
+
+        userMessage = "";
+    }
+
+    public class ChatMessage
+    {
+        public string Role { get; set; }
+        public string Content { get; set; }
     }
 }

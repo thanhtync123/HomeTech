@@ -14,7 +14,7 @@ builder.Services.AddScoped<ServiceService>();
 builder.Services.AddScoped<OrderService>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<OrderDetailService>();
-
+builder.Services.AddHttpClient();
 builder.Services.AddSingleton<CurrentUser>();
 builder.Services.AddMudServices();
 builder.Services.AddScoped<HomeTechBlazor.Managers.ChatbotManager>();

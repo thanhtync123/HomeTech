@@ -1,8 +1,10 @@
 ﻿@inherits LayoutComponentBase
 @inject CurrentUser CurrentUser
+
 <HeadContent>
     <link href="css/chatbot.css" rel="stylesheet" />
 </HeadContent>
+
 <div class="page">
     <div class="sidebar">
         <NavMenu />
@@ -10,24 +12,30 @@
 
     <main>
         <div class="top-row px-4">
-           <p>Xin chào @name</p>
-         <a href="/">Trang chủ</a>
+            <p>Xin chào @name</p>
+            <a href="/">Trang chủ</a>
         </div>
 
         <article class="content px-4">
             @Body
+
+            <!-- Chatbot sẽ hiển thị như một khung ngay trong layout -->
+            <div style="margin-top:20px;">
+                <Chatbot />
+            </div>
         </article>
     </main>
 </div>
-<Chatbot />
 
 <div id="blazor-error-ui" data-nosnippet>
     An unhandled error has occurred.
     <a href="." class="reload">Reload</a>
     <span class="dismiss">🗙</span>
 </div>
+
 @code {
     private string name;
+
     protected override void OnInitialized()
     {
         name = CurrentUser.name;
