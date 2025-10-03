@@ -1,6 +1,7 @@
 ﻿using HomeTechBlazor.Components;
 using HomeTechBlazor.Components.Shared;
 using HomeTechBlazor.Service;
+using Microsoft.AspNetCore.Components.Web;
 using MudBlazor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -19,6 +20,13 @@ builder.Services.AddSingleton<CurrentUser>();
 builder.Services.AddMudServices();
 builder.Services.AddScoped<HomeTechBlazor.Managers.ChatbotManager>();
 
+
+
+
+
+
+await builder.Build().RunAsync();
+builder.Services.AddScoped(sp => new HttpClient());
 // Cho phép tải file lớn
 builder.WebHost.ConfigureKestrel(options =>
 {
