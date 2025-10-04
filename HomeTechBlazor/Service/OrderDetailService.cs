@@ -3,6 +3,8 @@ using System.Xml.Linq;
 //using HomeTechBlazor.Components.Pages.Orders;
 using HomeTechBlazor.Model;
 using MySqlConnector;
+using static Microsoft.Extensions.Logging.EventSource.LoggingEventSource;
+using static MudBlazor.Icons;
 
 namespace HomeTechBlazor.Service
 {
@@ -183,13 +185,17 @@ namespace HomeTechBlazor.Service
 
         }
 
-        public async Task<List<Users>> getCustomerAsync()
+        public async Task<List<Users>> getCustomerAsync(int offset, int pagesize, string keyword)
         {
             await using var conn = await GetOpenConnectionAsync();
             var list = new List<Users>();
-            //id, name, phone, password, address, role, created_at, updated_at
             string sql = @$"
-                select * from users where role = 'customer'
+                select * from users
+                  WHERE  role = 'customer'
+                and (name LIKE '%{keyword}%'
+                OR phone LIKE '%{keyword}%')
+                                ORDER BY id DESC
+                                LIMIT {offset},{pagesize}
             ";
             var cmd = new MySqlCommand(sql, conn);
             await using var reader = await cmd.ExecuteReaderAsync();
@@ -207,6 +213,19 @@ namespace HomeTechBlazor.Service
             return list;
 
 
+        }
+        public async Task<int> CountAsync(string keyword)
+        {
+            await using var conn = await GetOpenConnectionAsync();
+            string sql = @$"
+        SELECT COUNT(*) 
+        FROM users
+        WHERE role = 'customer'
+          AND (name LIKE '%{keyword}%' OR phone LIKE '%{keyword}%')
+    ";
+            var cmd = new MySqlCommand(sql, conn);
+            var result = await cmd.ExecuteScalarAsync();
+            return Convert.ToInt32(result);
         }
         public async Task<int> getMaxOrderId()
         {

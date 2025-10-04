@@ -42,15 +42,16 @@ namespace HomeTechBlazor.Service
             {
                 list.Add(new Orders
                 {
-                    Id = reader.GetInt32("id"),
-                    CustomerName = reader.GetString("customer_name"),
-                    TechnicianName = Convert.ToString(reader["technician_name"]),
-                    ServiceName = reader.GetString("service_name"),
-                    ScheduleTime = reader.GetString("schedule_time"),
-                    Status = reader.GetString("status"),
-                    TotalPrice = reader.GetInt32("total_price"),
-                    CreatedAt = reader.GetString("created_at"),
-                    UpdatedAt = reader.GetString("updated_at")
+                    Id = reader.SafeGetInt("id"),
+                    CustomerName = reader.SafeGetString("customer_name"),
+                    TechnicianName = reader.SafeGetString("technician_name"),
+                    ServiceName = reader.SafeGetString("service_name"), 
+                    ScheduleTime = reader.SafeGetString("schedule_time"),
+                    Status = reader.SafeGetString("status"),
+                    TotalPrice = reader.SafeGetInt("total_price"),
+                    CreatedAt = reader.SafeGetString("created_at"),
+                    UpdatedAt = reader.SafeGetString("updated_at")
+
                 });
             }
             return list;

@@ -6,6 +6,13 @@
 
 @if(id == 0)
 {
+	<div class="input-group input-group-sm mb-3">
+		<span class="input-group-text" id="inputGroup-sizing-sm">Tìm kiếm</span>
+		<input @bind-value="keyword"
+			   @bind-value:event="oninput"
+			   @onkeyup="async () => await LoadDataCustomer()"
+			   class="form-control" placeholder="Tìm kiếm..." />
+	</div>
 	<div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
 		<table class="table table-striped table-bordered table-hover">
 			<tr>
@@ -25,7 +32,13 @@
 			}
 
 		</table>
+
 	</div>
+	<p>
+		@currentpage / @totalpage
+		<button class="btn btn-outline-secondary" @onclick="DownPage"> Giảm </button>
+		<button class="btn btn-outline-secondary" @onclick="UpPage"> Tăng </button>
+	</p>
 }
 
 
@@ -74,7 +87,7 @@
 
 	<div class="mb-2">
 		<label>Tên kỹ thuật viên</label>
-		<InputSelect @bind-Value="order.TechnicianId" class="form-control" TValue="int">
+		<InputSelect @bind-Value="order.TechnicianId" class="form-control" TValue="int?">
 			<option value="0">-- Chọn kỹ thuật viên --</option>
 			@foreach (var kv in technicalDict)
 			{
@@ -216,14 +229,47 @@
 	private Dictionary<int, (string, int)> serviceDict = new();
 	private List<Users> customerList = new();
 
+	string keyword = "";
+	int totalrecord = 0;
+	int totalpage = 0;
+	int offset = 1;
+	int pagesize = 10;
+	int currentpage = 1;
 
 	bool isNew = true;
 	int equipsPrice = 0;
 	int servicePrice = 12;
 	int totalprice = 0;
 	int maxOrderid = 0;
-	string keyword = "";
+	string keywordEquipment = "";
 	bool isDisableButtonSubmit=true;
+	private async Task LoadDataCustomer()
+	{
+		totalrecord = await orderDetailService.CountAsync(keyword);
+		totalpage = (int)Math.Ceiling((double)totalrecord / pagesize);
+		offset = (currentpage - 1) * pagesize;
+		customerList = await orderDetailService.getCustomerAsync(offset, pagesize, keyword);
+	}
+	private async Task UpPage()
+	{
+		if (currentpage < totalpage)
+		{
+			currentpage++;
+			offset = (currentpage - 1) * pagesize;
+			await LoadDataCustomer();
+
+		}
+	}
+	private async Task DownPage()
+	{
+		if (currentpage > 1)
+		{
+			currentpage--;
+			offset = (currentpage - 1) * pagesize;
+			await LoadDataCustomer();
+
+		}
+	}
 
 	private void Refreshform()
 	{
@@ -284,7 +330,8 @@
 	{
 		technicalDict = await orderDetailService.getTechnicalSelect();
 		serviceDict = await orderDetailService.getServiceSelect();
-		customerList = await orderDetailService.getCustomerAsync();
+		await LoadDataCustomer();
+
 		maxOrderid = await orderDetailService.getMaxOrderId() + 1;
 		await LoadEquipmentTable();
 
@@ -298,7 +345,7 @@
 	}
 	private async Task LoadEquipmentTable()
 	{
-		equipmentList = await orderDetailService.getEquipmentAsync(keyword);
+		equipmentList = await orderDetailService.getEquipmentAsync(keywordEquipment);
 	}
 	private void RemoveItem(int id)
 	{

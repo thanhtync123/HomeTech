@@ -5,8 +5,8 @@ namespace HomeTechBlazor.Model
 {
     public class OrderModel
     {
-        [Range(1, int.MaxValue, ErrorMessage = "Vui lòng chọn khách hàng")]
-        public int IdOrder { get; set; } = 0;
+        [Range(1, int.MaxValue, ErrorMessage = "thiếu mã phiếu")]
+        public int? IdOrder { get; set; } = 0;
 
         [Required(ErrorMessage = "IdCustomer là bắt buộc.")]
         public int IdCustomer { get; set; } = 0;
@@ -27,7 +27,7 @@ namespace HomeTechBlazor.Model
         public int ServiceId { get; set; } = 0;
 
         [Range(1, int.MaxValue, ErrorMessage = "Vui lòng chọn kỹ thuật viên.")]
-        public int TechnicianId { get; set; } = 0;
+        public int? TechnicianId { get; set; } = 0;
 
         [Required(ErrorMessage = "Status là bắt buộc.")]
         [StringLength(50, ErrorMessage = "Status không được quá 50 ký tự.")]
