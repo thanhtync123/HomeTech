@@ -19,7 +19,7 @@ builder.Services.AddScoped<BookingService>();
 builder.Services.AddHttpClient();
 builder.Services.AddSingleton<CurrentUser>();
 builder.Services.AddMudServices();
-builder.Services.AddScoped<HomeTechBlazor.Managers.ChatbotManager>();
+//builder.Services.AddScoped<HomeTechBlazor.Managers.ChatbotManager>();
 
 
 

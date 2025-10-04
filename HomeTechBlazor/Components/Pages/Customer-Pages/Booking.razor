@@ -1,20 +1,42 @@
-﻿@page "/book"
-
+﻿
+@page "/book"
 @layout LandingLayout
 @inject NavigationManager NavigationManager
 @inject BookingService bookingService
 @inject CurrentUser currentUser
 @rendermode InteractiveServer
+@inject HomeTechBlazor.Components.Shared.CurrentUser CurrentUser
+<link href="css/book.css" rel="stylesheet" />
+<nav class="navbar">
+    <div class="container flex justify-between items-center">
+        <!-- Logo + Text -->
+        <div class="flex items-center">
+            <img src="images/hometech.jpg" alt="Logo"
+                 style="width:40px; height:40px; object-fit:contain; margin-right:8px;" />
+            <h1 class="logo" style="margin:0; display:inline-block; line-height:40px;">
+                TECHFIX
+            </h1>
+        </div>
 
+        <!-- Navigation Links -->
+        <div class="nav-links flex items-center space-x-4">
+            <a href="#home">Trang Chủ</a>
+            <a href="#services">Dịch Vụ</a>
+            <a href="#about">Về Chúng Tôi</a>
+            <a href="#contact">Liên Hệ</a>
+            <a href="/home">Trang Quản Trị</a>
+        </div>
+    </div>
+</nav>
 <div class="container my-4">
-    <div class="card shadow-sm">
-        <div class="card-header bg-primary text-white">
-            <h4 class="mb-0">Đặt lịch dịch vụ</h4>
+    <div class="card">
+        <div class="card-header">
+            <h4>Đặt lịch dịch vụ</h4>
+            <small>Trải nghiệm dịch vụ cao cấp ngay hôm nay</small>
         </div>
         <div class="card-body">
-           <EditForm Model="order" OnValidSubmit="HandleValidSubmit">
-              
-	            <DataAnnotationsValidator />
+            <EditForm Model="order" OnValidSubmit="HandleValidSubmit">
+                <DataAnnotationsValidator />
                 <ValidationSummary />
                 <div class="mb-2">
                     <label>Mã khách hàng</label>
@@ -27,7 +49,7 @@
                     <ValidationMessage For="@(() => order.CustomerName)" />
                 </div>
                 <div class="mb-2">
-                    <label>SĐT</label>
+                    <label>Số điện thoại</label>
                     <InputText @bind-Value="order.Phone" class="form-control" readonly />
                     <ValidationMessage For="@(() => order.Phone)" />
                 </div>
@@ -36,36 +58,102 @@
                     <InputText @bind-Value="order.Address" class="form-control" readonly />
                     <ValidationMessage For="@(() => order.Address)" />
                 </div>
-
                 <div class="mb-2">
                     <label>Tên dịch vụ</label>
-                    <InputSelect @bind-Value="order.ServiceId"  class="form-control" TValue="int">
+                    <InputSelect @bind-Value="order.ServiceId" class="form-control" TValue="int">
                         <option value="0">-- Chọn dịch vụ --</option>
                         @foreach (var kv in serviceDict)
                         {
-                            <option value="@kv.Key">@kv.Value.Item1:@kv.Value.Item2.ToString("N0")</option>
+                            <option value="@kv.Key">@kv.Value.Item1: @kv.Value.Item2.ToString("N0")</option>
                         }
-                        <ValidationMessage For="@(() => order.ServiceId)" />
                     </InputSelect>
-
-
+                    <ValidationMessage For="@(() => order.ServiceId)" />
                 </div>
                 <div class="mb-2">
                     <label>Thời gian hẹn</label>
                     <InputDate @bind-Value="order.AppointmentTime" class="form-control" />
+                    <ValidationMessage For="@(() => order.AppointmentTime)" />
                 </div>
-
-
-                <button type="submit" class="btn btn-success w-100">
-                    Đặt lịch
+                <button type="submit" class="btn btn-success">
+                    Đặt lịch ngay
                 </button>
             </EditForm>
-
-
-          
         </div>
     </div>
+    <div class="services-column">
+        <!-- Services -->
+        <section id="services" class="section">
+            <h2 class="section-title">Các Dịch Vụ TECHFIX</h2>
+            <div class="slider-container">
+                <div class="slider">
+                    <div class="slide-track" id="slideTrack">
+                        <div class="slide">
+                            <img src="/images/car.jpg" alt="car">
+                            <h3>Sửa Chữa & Bảo Trì Xe</h3>
+                            <p>
+                                Dịch vụ sửa chữa và bảo trì xe chuyên nghiệp, giúp phương tiện của bạn vận hành êm ái,
+                                an toàn và tiết kiệm chi phí. Chúng tôi cam kết mang đến trải nghiệm nhanh chóng và tin cậy.
+                            </p>
+                        </div>
+                        <div class="slide">
+                            <img src="/images/pcc.jpg" alt="Sửa Chữa Máy Tính">
+                            <h3>Sửa Chữa Máy Tính</h3>
+                            <p>
+                                Sửa chữa máy tính từ phần cứng đến phần mềm, xử lý sự cố chậm, treo máy, hỏng hóc linh kiện.
+                                Đội ngũ kỹ thuật viên tận tâm sẽ khôi phục hiệu năng tối ưu cho thiết bị của bạn.
+                            </p>
+                        </div>
+                        <div class="slide">
+                            <img src="/images/elec.jpg" alt="Electrical">
+                            <h3>Sửa chữa & bảo trì hệ thống điện</h3>
+                            <p>
+                                Dịch vụ điện dân dụng và công nghiệp toàn diện: sửa chữa, lắp đặt, bảo trì hệ thống điện.
+                                Đảm bảo an toàn, ổn định và tiết kiệm điện năng cho gia đình cũng như doanh nghiệp.
+                            </p>
+                        </div>
+                        <div class="slide">
+                            <img src="/images/air.jpg" alt="air-conditioned">
+                            <h3>Sửa Chữa & Vệ Sinh Điện Lạnh</h3>
+                            <p>
+                                Vệ sinh, sửa chữa và bảo trì hệ thống điện lạnh định kỳ. Giúp máy lạnh, tủ lạnh hoạt động hiệu quả,
+                                mang lại không gian trong lành, thoáng mát và nâng cao tuổi thọ thiết bị.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <button class="control-btn" id="prevBtn">❮</button>
+                <button class="control-btn" id="nextBtn">❯</button>
+                <div class="pagination" id="pagination"></div>
+            </div>
+            <div class="more-btn-container" style="text-align: center; margin-top: 20px;">
+                <a href="/ServicesT" class="more-btn">Tìm Hiểu Thêm</a>
+            </div>
+        </section>
+    </div>
 </div>
+
+<div class="footer">
+    <div>
+        <h3>TECHFIX</h3>
+        <p>
+            ĐẶT NIỀM TIN - TRAO CHỮ TÍN
+        </p>
+    </div>
+    <div>
+        <h3>Liên Kết Nhanh</h3>
+        <a href="#services">Dịch Vụ</a> |
+        <a href="#about">Về Chúng Tôi</a> |
+        <a href="#contact">Liên Hệ</a>
+    </div>
+    <div>
+        <h3>Thông Tin Liên Hệ</h3>
+        <p>Email: support@techfix.com</p>
+        <p>Điện thoại: +84 123 456 789</p>
+        <p>Địa chỉ: P4 Phạm Thái Bường</p>
+    </div>
+    <p class="copy">© 2025 TECHFIX. All rights reserved.</p>
+</div>
+
 
 <Toast @ref="toastComponent" />
 
@@ -73,13 +161,12 @@
     private Toast toastComponent;
     private Dictionary<int, (string, int)> serviceDict = new();
     private OrderModel order = new OrderModel
-    {
-        Status = "pending",
-       AppointmentTime = DateTime.Today,
-        IdOrder = null,
-      TechnicianId = null,
-
-    };
+        {
+            Status = "pending",
+            AppointmentTime = DateTime.Today,
+            IdOrder = null,
+            TechnicianId = null
+        };
 
     protected override async Task OnInitializedAsync()
     {
@@ -88,11 +175,9 @@
         order.CustomerName = currentUser.name;
         order.Address = currentUser.address;
         order.Phone = currentUser.phone;
-
     }
 
     private async Task HandleValidSubmit()
-
     {
         try
         {
@@ -100,13 +185,10 @@
             toastComponent.ShowSuccess("Đã gửi yêu cầu, Kỹ thuật viên sẽ sớm liên hệ với bạn");
             await Task.Delay(2000);
             NavigationManager.NavigateTo("/");
-
-        }catch(Exception e)
-        {
-            toastComponent.ShowError(e + "");
         }
-
-
-
+        catch (Exception e)
+        {
+            toastComponent.ShowError(e.Message);
+        }
     }
 }
