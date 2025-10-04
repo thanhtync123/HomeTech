@@ -1,31 +1,56 @@
-﻿@inject HttpClient Http
+﻿@rendermode InteractiveServer
 
-<div class="chatbot-container">
-    <h4>🤖 Chatbot GitHub Models</h4>
+<!-- Float Button -->
+<button class="chatbot-float-btn" @onclick="ToggleChatbot">
+    💬
+</button>
 
-    <div class="chat-window">
-        @foreach (var msg in messages)
-        {
-            <div class="@(msg.Role == "user" ? "msg user" : "msg bot")">
-                <b>@msg.Role:</b> @msg.Content
-            </div>
-        }
+<!-- Popup Chatbot -->
+@if (isOpen)
+{
+    <div class="chatbot-popup">
+        <div class="chatbot-header">
+            <h4>🤖 Chatbot</h4>
+            <button class="close-btn" @onclick="ToggleChatbot">✕</button>
+        </div>
+
+        <div class="chat-window">
+            @foreach (var msg in messages)
+            {
+                <div class="@(msg.Role == "user" ? "msg user" : "msg bot")">
+                    <b>@msg.Role:</b> @msg.Content
+                </div>
+            }
+        </div>
+
+        <div class="chat-input">
+            <textarea @bind="userMessage" @bind:event="oninput" rows="2" placeholder="Nhập câu hỏi..."></textarea>
+            <button class="btn btn-primary" @onclick="SendMessage">Gửi</button>
+        </div>
     </div>
-
-    <div class="chat-input">
-        <textarea @bind="userMessage" rows="2" placeholder="Nhập câu hỏi..."></textarea>
-        <button class="btn btn-primary" @onclick="SendMessage">Gửi</button>
-    </div>
-</div>
+}
 
 @code {
     private string userMessage = "";
     private List<ChatMessage> messages = new();
+    private bool isOpen = false;
+
+    private void ToggleChatbot()
+    {
+        isOpen = !isOpen;
+    }
 
     private async Task SendMessage()
     {
+        Console.WriteLine("SendMessage called");
+
         if (string.IsNullOrWhiteSpace(userMessage))
+        {
+            Console.WriteLine("Empty message, returning");
             return;
+        }
+
+        Console.WriteLine($"Sending: {userMessage}");
 
         // Hiển thị tin nhắn của user
         messages.Add(new ChatMessage { Role = "user", Content = userMessage });
@@ -36,14 +61,18 @@
             messages = messages.Select(m => new { role = m.Role, content = m.Content }).ToArray()
         };
 
+        using var client = new HttpClient();
         using var req = new HttpRequestMessage(HttpMethod.Post, "https://models.github.ai/inference/chat/completions");
         req.Headers.Add("Authorization", "Bearer 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");
         req.Headers.Add("Accept", "application/vnd.github+json");
         req.Content = new StringContent(System.Text.Json.JsonSerializer.Serialize(requestData),
                                         System.Text.Encoding.UTF8, "application/json");
 
-        var res = await Http.SendAsync(req);
+        var res = await client.SendAsync(req);
         var body = await res.Content.ReadAsStringAsync();
+
+        Console.WriteLine($"Response status: {res.StatusCode}");
+        Console.WriteLine($"Response body: {body}");
 
         try
         {
@@ -56,8 +85,9 @@
 
             messages.Add(new ChatMessage { Role = "assistant", Content = aiReply });
         }
-        catch
+        catch (Exception ex)
         {
+            Console.WriteLine($"Error parsing: {ex.Message}");
             messages.Add(new ChatMessage { Role = "assistant", Content = "⚠️ Lỗi: " + body });
         }
 
