@@ -1,27 +1,74 @@
-﻿@page "/order_detail/{id:int}"
+﻿@page "/order/create"
+@page "/order_detail/{id:int}"
 @rendermode InteractiveServer
 @using HomeTechBlazor.Model
 @inject OrderDetailService orderDetailService
+
+@if(id == 0)
+{
+	<div class="input-group input-group-sm mb-3">
+		<span class="input-group-text" id="inputGroup-sizing-sm">Tìm kiếm</span>
+		<input @bind-value="keyword"
+			   @bind-value:event="oninput"
+			   @onkeyup="async () => await LoadDataCustomer()"
+			   class="form-control" placeholder="Tìm kiếm..." />
+	</div>
+	<div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+		<table class="table table-striped table-bordered table-hover">
+			<tr>
+				<th>ID</th>
+				<th>Họ tên</th>
+				<th>Địa chỉ</th>
+				<th>SĐT</th>
+			</tr>
+			@foreach (var item in customerList)
+			{
+				<tr @onclick="() => cellClickTBCustomer(item)">
+					<td>@item.Id</td>
+					<td>@item.Name</td>
+					<td>@item.Address</td>
+					<td>@item.Phone</td>
+				</tr>
+			}
+
+		</table>
+
+	</div>
+	<p>
+		@currentpage / @totalpage
+		<button class="btn btn-outline-secondary" @onclick="DownPage"> Giảm </button>
+		<button class="btn btn-outline-secondary" @onclick="UpPage"> Tăng </button>
+	</p>
+}
+
+
+
 <EditForm Model="order" OnValidSubmit="HandleValidSubmit">
+	<DataAnnotationsValidator />
 	<div class="mb-2">
 		<label>Mã phiếu</label>
 		<InputNumber @bind-Value="order.IdOrder" class="form-control" readonly />
+		<ValidationMessage For="@(() => order.IdOrder)" />
 	</div>
 	<div class="mb-2">
 		<label>Mã khách hàng</label>
 		<InputNumber @bind-Value="order.IdCustomer" class="form-control" readonly />
+		<ValidationMessage For="@(() => order.IdCustomer)" />
 	</div>
 	<div class="mb-2">
 		<label>Tên khách hàng</label>
 		<InputText @bind-Value="order.CustomerName" class="form-control" readonly />
+		<ValidationMessage For="@(() => order.CustomerName)" />
 	</div>
 	<div class="mb-2">
 		<label>SĐT</label>
 		<InputText @bind-Value="order.Phone" class="form-control" readonly />
+		<ValidationMessage For="@(() => order.Phone)" />
 	</div>
 	<div class="mb-2">
 		<label>Địa chỉ</label>
 		<InputText @bind-Value="order.Address" class="form-control" readonly />
+		<ValidationMessage For="@(() => order.Address)" />
 	</div>
 
 	<div class="mb-2">
@@ -32,6 +79,7 @@
 			{
 				<option value="@kv.Key">@kv.Value.Item1:@kv.Value.Item2.ToString("N0")</option>
 			}
+			<ValidationMessage For="@(() => order.ServiceId)" />
 		</InputSelect>
 
 
@@ -39,12 +87,13 @@
 
 	<div class="mb-2">
 		<label>Tên kỹ thuật viên</label>
-		<InputSelect @bind-Value="order.TechnicianId" class="form-control" TValue="int">
+		<InputSelect @bind-Value="order.TechnicianId" class="form-control" TValue="int?">
 			<option value="0">-- Chọn kỹ thuật viên --</option>
 			@foreach (var kv in technicalDict)
 			{
 				<option value="@kv.Key">@kv.Value</option>
 			}
+			<ValidationMessage For="@(() => order.TechnicianId)" />
 		</InputSelect>
 	</div>
 
@@ -116,7 +165,15 @@
 
 	</div>
 
-	<button type="submit" class="btn btn-primary mt-3">Lưu phiếu</button>
+	@if (id == 0)
+	{
+		<button type="submit" disabled="@(!isDisableButtonSubmit)" class="btn btn-primary mt-3">Tạo mới</button>
+	}
+	else
+	{
+		<button type="submit" class="btn btn-primary mt-3">Lưu phiếu</button>
+	}
+
 </EditForm>
 <input @bind-value="keyword"
 	   @bind-value:event="oninput"
@@ -157,36 +214,125 @@
 	</table>
 </div>
 
-
+<Toast @ref="toastComponent" />
 @code {
 	[Parameter] public int id { get; set; }
+	private Toast toastComponent;
 	private List<Equipments> equipmentList = new();
 	private List<Equipments> equipmentOrderList = new();
 	private List<OrderModel> orderInfor = new();
-	private OrderModel order = new();
+	private OrderModel order = new OrderModel
+	{
+		Status = "pending" 
+	};
 	private Dictionary<int, string> technicalDict = new();
 	private Dictionary<int, (string, int)> serviceDict = new();
+	private List<Users> customerList = new();
 
+	string keyword = "";
+	int totalrecord = 0;
+	int totalpage = 0;
+	int offset = 1;
+	int pagesize = 10;
+	int currentpage = 1;
 
-
+	bool isNew = true;
 	int equipsPrice = 0;
 	int servicePrice = 12;
 	int totalprice = 0;
+	int maxOrderid = 0;
+	string keywordEquipment = "";
+	bool isDisableButtonSubmit=true;
+	private async Task LoadDataCustomer()
+	{
+		totalrecord = await orderDetailService.CountAsync(keyword);
+		totalpage = (int)Math.Ceiling((double)totalrecord / pagesize);
+		offset = (currentpage - 1) * pagesize;
+		customerList = await orderDetailService.getCustomerAsync(offset, pagesize, keyword);
+	}
+	private async Task UpPage()
+	{
+		if (currentpage < totalpage)
+		{
+			currentpage++;
+			offset = (currentpage - 1) * pagesize;
+			await LoadDataCustomer();
 
-	string keyword = "";
+		}
+	}
+	private async Task DownPage()
+	{
+		if (currentpage > 1)
+		{
+			currentpage--;
+			offset = (currentpage - 1) * pagesize;
+			await LoadDataCustomer();
 
+		}
+	}
+
+	private void Refreshform()
+	{
+		order.IdOrder = 0;
+		order.IdCustomer = 0;
+		order.Phone = "";
+		order.Address = "";
+		order.CustomerName = "";
+		order.CreatedDate = null;           
+		order.UpdatedDate = null;
+		order.AppointmentTime = DateTime.Now;              
+		order.Status = "pending";
+		order.totalPrice = 0;
+		order.ServiceId = 0;
+		order.TechnicianId = 0;
+		order.Items = new();
+		equipmentOrderList = new();
+		totalprice = 0;
+		equipsPrice = 0;
+		servicePrice = 0;
+	}
 	private async Task HandleValidSubmit()
 	{
 
+
 		order.totalPrice = equipsPrice + servicePrice;
 		order.Items = equipmentOrderList;
-		await orderDetailService.SaveOrderExamSync(order);
+		try
+		{
+			if (id != 0)
+			{
+				Console.WriteLine("Create 1");
+				await orderDetailService.SaveOrderExamSync(order);
+				toastComponent.ShowSuccess("Cập nhật phiếu thành công");
+			}
+
+			else if (id == 0)
+			{
+				Console.WriteLine("Create 2");
+				await orderDetailService.CreateOrderExamSync(order);
+				toastComponent.ShowSuccess("Tạo phiếu thành công");
+				isDisableButtonSubmit = false;
+				Refreshform();
+			}
+
+
+		}
+		catch(Exception e)
+		{
+			toastComponent.ShowSuccess(e.ToString());
+		}
+
+
+
 	}
 
 	protected override async Task OnInitializedAsync()
 	{
 		technicalDict = await orderDetailService.getTechnicalSelect();
 		serviceDict = await orderDetailService.getServiceSelect();
+		await LoadDataCustomer();
+
+		maxOrderid = await orderDetailService.getMaxOrderId() + 1;
 		await LoadEquipmentTable();
 
 		var orders = await orderDetailService.getOrderAsync(id);
@@ -199,7 +345,7 @@
 	}
 	private async Task LoadEquipmentTable()
 	{
-		equipmentList = await orderDetailService.getEquipmentAsync(keyword);
+		equipmentList = await orderDetailService.getEquipmentAsync(keywordEquipment);
 	}
 	private void RemoveItem(int id)
 	{
@@ -258,6 +404,16 @@
 			servicePrice = 0;
 
 		totalprice = equipsPrice + servicePrice;
+	}
+	private void cellClickTBCustomer(Users om)
+	{
+		order.IdCustomer = om.Id;
+		order.CustomerName = om.Name;
+		order.Phone = om.Phone;
+		order.Address = om.Address;
+		order.IdOrder = maxOrderid;
+		isDisableButtonSubmit = true;
+
 	}
 
 
