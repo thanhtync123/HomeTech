@@ -42,7 +42,7 @@
 						<option value="cancelled">cancelled</option>
 					</select>
 				</td>
-				<td>@item.TotalPrice</td>
+				<td>@(Convert.ToDecimal(item.TotalPrice).ToString("N0"))</td>
 				<td>@item.CreatedAt</td>
 				<td>@item.UpdatedAt</td>
 				<td>
