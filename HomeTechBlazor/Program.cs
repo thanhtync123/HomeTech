@@ -25,8 +25,6 @@ builder.Services.AddScoped<HomeTechBlazor.Managers.ChatbotManager>();
 
 
 
-await builder.Build().RunAsync();
-builder.Services.AddScoped(sp => new HttpClient());
 // Cho phép tải file lớn
 builder.WebHost.ConfigureKestrel(options =>
 {
