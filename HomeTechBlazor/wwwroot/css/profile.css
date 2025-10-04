@@ -1,4 +1,4 @@
-﻿/* -------- Background toàn trang -------- */
+﻿/* ===== PROFILE PAGE ===== */
 .profile-page {
     min-height: 100vh;
     display: flex;
@@ -7,7 +7,6 @@
     padding: 2rem;
     font-family: "Segoe UI", sans-serif;
     color: #fff;
-    /* Nếu có ảnh HD (1920px) thì dùng full màn hình */
     background: url("/images/do.jpg") no-repeat center center fixed;
     background-size: cover;
     background-color: #0b1c33;
@@ -18,9 +17,10 @@
         content: "";
         position: absolute;
         inset: 0;
-        background: rgba(0, 0, 0, 0.45); /* overlay tối để card nổi */
+        background: rgba(0, 0, 0, 0.45);
     }
 
+/* --- Container --- */
 .profile-container {
     position: relative;
     z-index: 1;
@@ -29,7 +29,6 @@
     gap: 2rem;
     width: 100%;
     max-width: 900px;
-    /* Glass effect */
     background: rgba(255, 255, 255, 0.08);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
@@ -40,7 +39,7 @@
     animation: fadeInUp 1s ease;
 }
 
-/* -------- Avatar -------- */
+/* --- Avatar --- */
 .avatar-wrapper {
     position: relative;
     display: flex;
@@ -81,7 +80,7 @@
         background: rgba(0,0,0,0.85);
     }
 
-/* -------- Info -------- */
+/* --- User info --- */
 .user-name {
     text-align: center;
     font-size: 1.4rem;
@@ -89,23 +88,13 @@
     margin-top: 0.8rem;
 }
 
-.role-tag {
+.role-tag, .phone-tag {
     text-align: center;
     font-size: 0.9rem;
     margin-top: 0.3rem;
-    background: rgba(255,255,255,0.2);
-    padding: 0.2rem 0.8rem;
-    border-radius: 12px;
 }
 
-.phone-tag {
-    text-align: center;
-    font-size: 0.9rem;
-    margin-top: 0.2rem;
-    opacity: 0.9;
-}
-
-/* -------- Form -------- */
+/* --- Right panel --- */
 .profile-right {
     display: flex;
     flex-direction: column;
@@ -119,6 +108,7 @@
     text-align: center;
 }
 
+/* --- Inputs --- */
 .form-group {
     margin-bottom: 1rem;
     position: relative;
@@ -133,27 +123,60 @@
     opacity: 0.8;
 }
 
-.form-control {
+/* ====== INPUT STYLE FIXED ====== */
+input.form-control,
+textarea.form-control {
     width: 100%;
     padding: 0.9rem 1rem 0.9rem 2.6rem;
     border-radius: 10px;
     border: none;
-    background: rgba(0,0,0,0.5);
-    color: #fff;
+    background-color: rgba(255, 255, 255, 0.18) !important;
+    color: #fff !important;
     font-size: 1rem;
+    transition: background-color 0.25s ease, box-shadow 0.25s ease;
+    -webkit-text-fill-color: #fff !important;
+    box-shadow: none !important;
 }
 
-    .form-control::placeholder {
-        color: rgba(255,255,255,0.7);
+    /* Khi focus – vẫn sáng, không đen */
+    input.form-control:focus,
+    textarea.form-control:focus {
+        outline: none !important;
+        background-color: rgba(255, 255, 255, 0.28) !important;
+        box-shadow: 0 0 8px rgba(255, 255, 255, 0.4) !important;
+        color: #fff !important;
+        -webkit-text-fill-color: #fff !important;
     }
 
-    .form-control:focus {
-        outline: none;
-        background: rgba(0,0,0,0.65);
-        box-shadow: 0 0 8px rgba(255,255,255,0.4);
+    /* Khi disabled – vẫn sáng, không tối */
+    input.form-control:disabled,
+    textarea.form-control:disabled {
+        background-color: rgba(255, 255, 255, 0.25) !important;
+        color: #fff !important;
+        opacity: 1 !important;
+        cursor: not-allowed !important;
+        box-shadow: none !important;
     }
 
-/* -------- Button -------- */
+    /* Fix autofill Chrome / Edge */
+    input.form-control:-webkit-autofill,
+    input.form-control:-webkit-autofill:hover,
+    input.form-control:-webkit-autofill:focus,
+    textarea.form-control:-webkit-autofill,
+    textarea.form-control:-webkit-autofill:hover,
+    textarea.form-control:-webkit-autofill:focus {
+        -webkit-box-shadow: 0 0 0 1000px rgba(255, 255, 255, 0.18) inset !important;
+        box-shadow: 0 0 0 1000px rgba(255, 255, 255, 0.18) inset !important;
+        -webkit-text-fill-color: #fff !important;
+        caret-color: #fff !important;
+    }
+
+/* --- Placeholder --- */
+.form-control::placeholder {
+    color: rgba(255,255,255,0.7);
+}
+
+/* --- Button --- */
 .btn-save {
     margin-top: 10px;
     padding: 0.9rem;
@@ -173,7 +196,7 @@
         transform: translateY(-2px);
     }
 
-/* -------- Animation -------- */
+/* --- Animation --- */
 @keyframes fadeInUp {
     from {
         opacity: 0;
@@ -186,16 +209,10 @@
     }
 }
 
-/* -------- Responsive -------- */
+/* --- Responsive --- */
 @media (max-width: 768px) {
     .profile-container {
         grid-template-columns: 1fr;
         text-align: center;
     }
-}
-.form-control:disabled {
-    background: rgba(255, 255, 255, 0.1) !important; /* nền trong suốt nhẹ */
-    color: #fff !important; /* chữ trắng rõ ràng */
-    opacity: 1 !important; /* tránh bị mờ */
-    cursor: not-allowed;
 }
