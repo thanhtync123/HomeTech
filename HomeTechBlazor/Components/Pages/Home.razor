@@ -52,7 +52,7 @@
                 <p class="sub">Xem chi tiết</p>
             </div>
             <div class="card bg-purple">
-                <h3>Revenue (This Month)</h3>
+                <h3>So Với  (Tháng hiện tại)</h3>
                 <p class="value">12,540,000</p>
                 <p class="sub">+12% so với tháng trước</p>
             </div>
@@ -61,49 +61,49 @@
         <!-- Charts -->
         <div class="charts">
             <div class="chart-box">
-                <h3>Device Activity (Last 7 Days)</h3>
+                <h3>Thiết bị hoạt động (7 ngày qua)</h3>
                 <canvas id="deviceActivityChart"></canvas>
             </div>
             <div class="chart-box">
-                <h3>Orders by Status</h3>
+                <h3>Trạng thái đặt dịch vụ</h3>
                 <canvas id="ordersChart"></canvas>
             </div>
         </div>
 
         <!-- Recent Activity Table -->
         <div class="recent-orders">
-            <h3>Recent Activity</h3>
+            <h3>Hoạt động gần đây</h3>
             <table class="orders-table">
                 <thead>
                     <tr>
-                        <th>Device</th>
-                        <th>Action</th>
-                        <th>User</th>
-                        <th>Time</th>
-                        <th>Status</th>
+                        <th>Thiết bị</th>
+                        <th>Hành động</th>
+                        <th>Người dùng</th>
+                        <th>Thời gian</th>
+                        <th>Trạng thái</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td>Smart Light</td>
-                        <td>Turned On</td>
+                        <td>Lắp đặt đèn thông minh</td>
+                        <td>Đã lắp</td>
                         <td>@CurrentUser.name</td>
                         <td>10:30 AM</td>
-                        <td><span class="status success">Success</span></td>
+                        <td><span class="status success">Tốt</span></td>
                     </tr>
                     <tr>
-                        <td>Thermostat</td>
-                        <td>Temperature Adjusted</td>
+                        <td>Sửa máy tính</td>
+                        <td>Đang sửa </td>
                         <td>John Doe</td>
                         <td>9:15 AM</td>
-                        <td><span class="status pending">Pending</span></td>
+                        <td><span class="status pending">Đang chờ</span></td>
                     </tr>
                     <tr>
-                        <td>Security Camera</td>
-                        <td>Motion Detected</td>
-                        <td>System</td>
+                        <td>Lắp đặt Camera</td>
+                        <td>Đã lắp</td>
+                        <td>Jack</td>
                         <td>8:45 AM</td>
-                        <td><span class="status warning">Alert</span></td>
+                        <td><span class="status warning">Tốt</span></td>
                     </tr>
                 </tbody>
             </table>

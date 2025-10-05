@@ -1,33 +1,36 @@
-﻿
-@page "/book"
+﻿@page "/book"
+
 @layout LandingLayout
 @inject NavigationManager NavigationManager
 @inject BookingService bookingService
 @inject CurrentUser currentUser
 @rendermode InteractiveServer
 @inject HomeTechBlazor.Components.Shared.CurrentUser CurrentUser
+
 <link href="css/book.css" rel="stylesheet" />
+
 <nav class="navbar">
     <div class="container flex justify-between items-center">
         <!-- Logo + Text -->
         <div class="flex items-center">
             <img src="images/hometech.jpg" alt="Logo"
-                 style="width:40px; height:40px; object-fit:contain; margin-right:8px;" />
-            <h1 class="logo" style="margin:0; display:inline-block; line-height:40px;">
+                 style="width:40px; height:60px; object-fit:contain; margin-right:8px;" />
+            <h1 class="logo" style="margin:8px; display:inline-block; line-height:60px;">
                 TECHFIX
             </h1>
         </div>
 
         <!-- Navigation Links -->
         <div class="nav-links flex items-center space-x-4">
-            <a href="#home">Trang Chủ</a>
-            <a href="#services">Dịch Vụ</a>
-            <a href="#about">Về Chúng Tôi</a>
-            <a href="#contact">Liên Hệ</a>
-            <a href="/home">Trang Quản Trị</a>
+            <NavLink href="/" Match="NavLinkMatch.All">Trang Chủ |</NavLink>
+            <NavLink href="/ServicesT">Dịch Vụ |</NavLink>
+            <NavLink href="/about">Về Chúng Tôi |</NavLink>
+            <NavLink href="/contact">Liên Hệ |</NavLink>
+            <NavLink href="/home">Trang Quản Trị</NavLink>
         </div>
     </div>
 </nav>
+
 <div class="container my-4">
     <div class="card">
         <div class="card-header">
@@ -80,8 +83,8 @@
             </EditForm>
         </div>
     </div>
+
     <div class="services-column">
-        <!-- Services -->
         <section id="services" class="section">
             <h2 class="section-title">Các Dịch Vụ TECHFIX</h2>
             <div class="slider-container">
@@ -125,8 +128,24 @@
                 <button class="control-btn" id="nextBtn">❯</button>
                 <div class="pagination" id="pagination"></div>
             </div>
+
             <div class="more-btn-container" style="text-align: center; margin-top: 20px;">
                 <a href="/ServicesT" class="more-btn">Tìm Hiểu Thêm</a>
+            </div>
+
+            <!-- VỀ TECHFIX + MAP -->
+            <div class="company-info">
+                <img src="images/hometech.jpg" alt="Techfix Logo" class="company-logo" />
+                <div class="company-description">
+                    <h3>Về TECHFIX</h3>
+                    <p>
+                        TECHFIX là web trong lĩnh vực kỹ thuật & công nghệ, cung cấp các giải pháp sáng tạo và dịch vụ sửa chữa chất lượng cao. Chúng tôi cam kết mang đến trải nghiệm tốt nhất cho khách hàng.
+                    </p>
+                </div>
+
+                <div class="map-container">
+                    <iframe src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d15705.130930698686!2d105.98417167672112!3d10.238765824299422!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sen!2s!4v1759656345208!5m2!1sen!2s" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                </div>
             </div>
         </section>
     </div>
@@ -135,9 +154,7 @@
 <div class="footer">
     <div>
         <h3>TECHFIX</h3>
-        <p>
-            ĐẶT NIỀM TIN - TRAO CHỮ TÍN
-        </p>
+        <p>ĐẶT NIỀM TIN - TRAO CHỮ TÍN</p>
     </div>
     <div>
         <h3>Liên Kết Nhanh</h3>
@@ -153,7 +170,6 @@
     </div>
     <p class="copy">© 2025 TECHFIX. All rights reserved.</p>
 </div>
-
 
 <Toast @ref="toastComponent" />
 
