@@ -3,141 +3,163 @@
 @inject OrderService orderService
 @inherits HomeTechBlazor.Components.Shared.AdminPageBase
 
-<h3>Đặt Dịch Vụ</h3>
-<div class="input-group input-group-sm mb-3">
-	<span class="input-group-text" id="inputGroup-sizing-sm">Tìm kiếm</span>
-	<input @bind-value="keyword"
-		   @bind-value:event="oninput"
-		   @onkeyup="async () => await LoadData()"
-		   class="form-control" placeholder="Tìm kiếm..." />
+<HeadContent>
+    <link href="css/Order.css" rel="stylesheet" />
+</HeadContent>
+
+<h3 class="page-title">Đặt Dịch Vụ</h3>
+
+<div class="search-bar mb-3">
+    <span class="input-label">🔍 Tìm kiếm</span>
+    <input @bind-value="keyword"
+           @bind-value:event="oninput"
+           @onkeyup="async () => await LoadData()"
+           class="form-control search-input"
+           placeholder="Nhập từ khóa..." />
 </div>
-<table class="table table-bordered table-striped table-hover">
-	<thead class="table-dark">
-		<tr>
-			<th>ID</th>
-			<th>Tên KH</th>
-			<th>Tên KTV</th>
-			<th>Dịch vụ</th>
-			<th>Thời gian hẹn</th>
-			<th>Trạng thái</th>
-			<th>Tổng tiền</th>
-			<th>Thời gian tạo</th>
-			<th>Thời gian cập nhật</th>
-			<th>Thao tác</th>
-		</tr>
-	</thead>
-	<tbody>
-		@foreach (var item in lod)
-		{
-			<tr>
-				<td>@item.Id</td>
-				<td>@item.CustomerName</td>
-				<td>@item.TechnicianName</td>
-				<td>@item.ServiceName</td>
-				<td>@item.ScheduleTime</td>
-				<td>
-					<select value="@item.Status" @onchange="(e) => UpdateStatus(item.Id, e.Value?.ToString())">
-						<option value="pending">pending</option>
-						<option value="completed">completed</option>
-						<option value="cancelled">cancelled</option>
-					</select>
-				</td>
-				<td>@(Convert.ToDecimal(item.TotalPrice).ToString("N0"))</td>
-				<td>@item.CreatedAt</td>
-				<td>@item.UpdatedAt</td>
-				<td>
-					<NavLink href="@($"/order_detail/{item.Id}")">Cập nhật</NavLink>
-				</td>
-			</tr>
-		}
-	</tbody>
-</table>
-<p>
-	@currentpage / @totalpage
-	<button class="btn btn-outline-secondary" @onclick="DownPage"> Giảm </button>
-	<button class="btn btn-outline-secondary" @onclick="UpPage"> Tăng </button>
-</p>
-<a href="/order/create"><button class="btn btn-outline-secondary">Tạo mới phiếu </button></a>
+
+<div class="table-container">
+    <table class="custom-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Tên KH</th>
+                <th>Tên KTV</th>
+                <th>Dịch vụ</th>
+                <th>Thời gian hẹn</th>
+                <th>Trạng thái</th>
+                <th>Tổng tiền</th>
+                <th>Thời gian tạo</th>
+                <th>Thời gian cập nhật</th>
+                <th>Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in lod)
+            {
+                <tr>
+                    <td>@item.Id</td>
+                    <td>@item.CustomerName</td>
+                    <td>@item.TechnicianName</td>
+                    <td>@item.ServiceName</td>
+                    <td>@item.ScheduleTime</td>
+                    <td>
+                        <select value="@item.Status"
+                                @onchange="(e) => UpdateStatus(item.Id, e.Value?.ToString())"
+                                class="status-select @(item.Status)">
+                            <option value="pending">pending</option>
+                            <option value="completed">completed</option>
+                            <option value="cancelled">cancelled</option>
+                        </select>
+                    </td>
+                    <td>@(Convert.ToDecimal(item.TotalPrice).ToString("N0"))</td>
+                    <td>@item.CreatedAt</td>
+                    <td>@item.UpdatedAt</td>
+                    <td>
+                        <NavLink href="@($"/order_detail/{item.Id}")" class="action-link">
+                            Cập nhật
+                        </NavLink>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<div class="pagination">
+    <p>Trang @currentpage / @totalpage</p>
+    <div>
+        <button class="btn btn-outline-light" @onclick="DownPage">◀ Trước</button>
+        <button class="btn btn-outline-light" @onclick="UpPage">Tiếp ▶</button>
+    </div>
+</div>
+
+<a href="/order/create">
+    <button class="btn btn-primary create-btn">+ Tạo mới phiếu</button>
+</a>
+
 <p>@a</p>
 <p>@msg</p>
 
 @code {
-	List<HomeTechBlazor.Model.Orders> lod = new();
+    List<HomeTechBlazor.Model.Orders> lod = new();
 
-	string keyword = "";
-	int totalrecord = 0;
-	int totalpage = 0;
-	int offset = 1;
-	int pagesize = 10;
-	int currentpage = 1;
+    string keyword = "";
+    int totalrecord = 0;
+    int totalpage = 0;
+    int offset = 1;
+    int pagesize = 10;
+    int currentpage = 1;
 
-	string msg = "";
+    string msg = "";
 
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
 
-	protected override async Task OnInitializedAsync()
-	{
-		await LoadData();
-	}
-	private async Task LoadData()
-	{
-		totalrecord = await orderService.CountAsync(keyword);
-		totalpage = (int)Math.Ceiling((double)totalrecord / pagesize);
-		offset = (currentpage - 1) * pagesize;
-		lod = await orderService.GetAllAsync(offset, pagesize, keyword);
-	}
-	private async Task UpPage()
-	{
-		if (currentpage < totalpage)
-		{
-			currentpage++;
-			offset = (currentpage - 1) * pagesize;
-			await LoadData();
-		}
-	}
-	private async Task DownPage()
-	{
-		if (currentpage > 1)
-		{
-			currentpage--;
-			offset = (currentpage - 1) * pagesize;
-			await LoadData();
-		}
-	}
-	int a = 0;
-	private async Task SearchOrder(ChangeEventArgs e)
-	{
-		a++;
-		keyword = e.Value?.ToString() ?? "";
-		await LoadData();
-	}
-	private async Task UpdateStatus(int id,string newStatus)
-	{
+    private async Task LoadData()
+    {
+        totalrecord = await orderService.CountAsync(keyword);
+        totalpage = (int)Math.Ceiling((double)totalrecord / pagesize);
+        offset = (currentpage - 1) * pagesize;
+        lod = await orderService.GetAllAsync(offset, pagesize, keyword);
+    }
 
-		try
-		{
-			Orders orders = new Orders
-				{
-					Id = id,
-					CustomerId = 0,
-					ServiceId = 0,
-					TechnicianId = null,
-					ScheduleTime = string.Empty,
-					Status = newStatus,
-					TotalPrice = null,
-					CreatedAt = string.Empty,
-					UpdatedAt = string.Empty,
-					CustomerName = string.Empty,
-					ServiceName = string.Empty,
-					TechnicianName = string.Empty
-				};
-			await orderService.UpdateStatusSync(orders);
-			await LoadData();
-			
-		}
-		catch (Exception e)
-		{
-			 msg = e.ToString();
-		}
-	}
+    private async Task UpPage()
+    {
+        if (currentpage < totalpage)
+        {
+            currentpage++;
+            offset = (currentpage - 1) * pagesize;
+            await LoadData();
+        }
+    }
 
+    private async Task DownPage()
+    {
+        if (currentpage > 1)
+        {
+            currentpage--;
+            offset = (currentpage - 1) * pagesize;
+            await LoadData();
+        }
+    }
+
+    int a = 0;
+
+    private async Task SearchOrder(ChangeEventArgs e)
+    {
+        a++;
+        keyword = e.Value?.ToString() ?? "";
+        await LoadData();
+    }
+
+    private async Task UpdateStatus(int id, string newStatus)
+    {
+        try
+        {
+            Orders orders = new Orders
+                {
+                    Id = id,
+                    CustomerId = 0,
+                    ServiceId = 0,
+                    TechnicianId = null,
+                    ScheduleTime = string.Empty,
+                    Status = newStatus,
+                    TotalPrice = null,
+                    CreatedAt = string.Empty,
+                    UpdatedAt = string.Empty,
+                    CustomerName = string.Empty,
+                    ServiceName = string.Empty,
+                    TechnicianName = string.Empty
+                };
+            await orderService.UpdateStatusSync(orders);
+            await LoadData();
+        }
+        catch (Exception e)
+        {
+            msg = e.ToString();
+        }
+    }
 }
