@@ -4,20 +4,74 @@
 @inject LoginService loginService
 @inject NavigationManager NavigationManager
 @inject CurrentUser CurrentUser
+@inject IJSRuntime JSRuntime
 
 <HeadContent>
     <link href="css/login.css" rel="stylesheet" />
 </HeadContent>
 
 <style>
-    body {
-        overflow: hidden; /* Disable body scrolling */
+    body, html {
+        overflow: hidden; /* Vô hiệu hóa cuộn trang */
         margin: 0;
-        height: 100vh; /* Ensure body takes full viewport height */
+        height: 100vh; /* Đảm bảo chiếm toàn bộ chiều cao màn hình */
+    }
+    /* Thêm CSS cho các thành phần mới nếu cần */
+    .or-separator {
+        text-align: center;
+        margin: 1.5rem 0;
+        color: #888;
+        font-weight: 600;
     }
 
-    html {
-        height: 100%; /* Ensure html takes full height to support body */
+    .btn-face-login {
+        width: 100%;
+        padding: 0.75rem;
+        background-color: #3b5998; /* Màu giống Facebook */
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+        .btn-face-login:hover {
+            background-color: #334d84;
+        }
+
+    .face-login-view .video-container {
+        position: relative;
+        width: 100%;
+        padding-top: 75%; /* Tỉ lệ 4:3 */
+        background: #000;
+        border-radius: 8px;
+        overflow: hidden;
+        margin-bottom: 1rem;
+    }
+
+    .face-login-view video {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .btn-cancel {
+        background: #6c757d;
+        color: white;
+        margin-top: 0.5rem;
+        width: 100%;
+        padding: 0.75rem;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
     }
 </style>
 
@@ -35,27 +89,56 @@
                 <p>Chào mừng bạn đến với TECHFIX</p>
             </div>
 
-            <EditForm Model="@loginModel" FormName="form_login" OnValidSubmit="OnValidSubmit" class="login-form">
-                <DataAnnotationsValidator />
-
-                <div class="form-group icon-input">
-                    <span class="icon"></span>
-                    <InputText @bind-Value="loginModel.Phone" placeholder="Số điện thoại" class="form-control" />
-                    <ValidationMessage For="@(() => loginModel.Phone)" />
+            @if (isFaceLoginActive)
+            {
+                <div class="face-login-view">
+                    <p style="text-align: center; margin-bottom: 1rem;">Vui lòng nhìn thẳng vào camera</p>
+                    <div class="video-container">
+                        <video id="videoFeed" autoplay muted playsinline></video>
+                    </div>
+                    <button @onclick="CaptureAndVerifyFace" class="btn-login" disabled="@isProcessing">
+                        @if (isProcessing)
+                        {
+                            <span>Đang xác thực...</span>
+                        }
+                        else
+                        {
+                            <span>Xác thực</span>
+                        }
+                    </button>
+                    <button @onclick="CancelFaceLogin" class="btn-cancel" disabled="@isProcessing">Hủy</button>
                 </div>
+            }
+            else
+            {
+                <EditForm Model="@loginModel" FormName="form_login" OnValidSubmit="OnValidSubmit" class="login-form">
+                    <DataAnnotationsValidator />
 
-                <div class="form-group icon-input">
-                    <span class="icon"></span>
-                    <InputText type="password" @bind-Value="loginModel.Password" placeholder="Mật khẩu" class="form-control" />
-                    <ValidationMessage For="@(() => loginModel.Password)" />
+                    <div class="form-group icon-input">
+                        <span class="icon"></span>
+                        <InputText @bind-Value="loginModel.Phone" placeholder="Số điện thoại" class="form-control" />
+                        <ValidationMessage For="@(() => loginModel.Phone)" />
+                    </div>
+
+                    <div class="form-group icon-input">
+                        <span class="icon"></span>
+                        <InputText type="password" @bind-Value="loginModel.Password" placeholder="Mật khẩu" class="form-control" />
+                        <ValidationMessage For="@(() => loginModel.Password)" />
+                    </div>
+
+                    <button type="submit" class="btn-login">Đăng Nhập</button>
+                </EditForm>
+
+                <div class="or-separator">HOẶC</div>
+
+                <button @onclick="StartFaceLogin" class="btn-face-login">
+                    <span class="icon-face"></span> Đăng nhập bằng khuôn mặt
+                </button>
+
+                <div class="register-link">
+                    <p>Chưa có tài khoản? <a href="/register">Đăng ký ngay</a></p>
                 </div>
-
-                <button type="submit" class="btn-login">Đăng Nhập</button>
-            </EditForm>
-
-            <div class="register-link">
-                <p>Chưa có tài khoản? <a href="/register">Đăng ký ngay</a></p>
-            </div>
+            }
         </div>
         <div class="company-info">
             <img src="images/logo.png" alt="Techfix Logo" class="company-logo" />
@@ -72,7 +155,108 @@
 @code {
     private Toast toastComponent;
     private HomeTechBlazor.Model.LoginModel loginModel = new();
-    private void setCurrentUser(string role, string phone, string name, string address, string password,string id)
+    private IJSObjectReference? module;
+    private bool isFaceLoginActive = false;
+    private bool isProcessing = false;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            try
+            {
+                module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./js/faceAuth.js");
+                await module.InvokeVoidAsync("loadModels");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error loading JS module: {ex.Message}");
+                toastComponent.ShowError("Lỗi tải tài nguyên, vui lòng tải lại trang.");
+            }
+        }
+    }
+
+    private async Task OnValidSubmit()
+    {
+        try
+        {
+            var json = await loginService.LoginAsync(loginModel.Phone, loginModel.Password);
+            if (string.IsNullOrEmpty(json))
+            {
+                toastComponent.ShowError("Sai tài khoản hoặc mật khẩu");
+                return;
+            }
+
+            var user = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, string>>(json)!;
+            setCurrentUser(user["role"], user["phone"], user["name"], user["address"], user["dbPassword"], user["id"]);
+            NavigationManager.NavigateTo(user["role"] == "admin" ? "/home" : "/");
+        }
+        catch (Exception e)
+        {
+            toastComponent.ShowError($"Đã có lỗi xảy ra: {e.Message}");
+        }
+    }
+
+    private async Task StartFaceLogin()
+    {
+        isFaceLoginActive = true;
+        await InvokeAsync(StateHasChanged);
+
+        await Task.Delay(50);
+        if (module is not null)
+        {
+            bool videoStarted = await module.InvokeAsync<bool>("startVideo", "videoFeed");
+            if (!videoStarted)
+            {
+                toastComponent.ShowError("Không thể truy cập camera. Vui lòng cấp quyền trong trình duyệt.");
+                isFaceLoginActive = false;
+            }
+        }
+    }
+
+    private async Task CaptureAndVerifyFace()
+    {
+        if (module is null) return;
+
+        isProcessing = true;
+
+        var descriptor = await module.InvokeAsync<float[]?>("getFaceDescriptor", "videoFeed");
+
+        if (descriptor != null)
+        {
+            var userJson = await loginService.VerifyFaceLoginAsync(descriptor);
+            if (!string.IsNullOrEmpty(userJson))
+            {
+                toastComponent.ShowSuccess("Xác thực khuôn mặt thành công!");
+                await CancelFaceLogin();
+
+                var user = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, string>>(userJson)!;
+                setCurrentUser(user["role"], user["phone"], user["name"], user["address"], user["dbPassword"], user["id"]);
+                NavigationManager.NavigateTo(user["role"] == "admin" ? "/home" : "/");
+            }
+            else
+            {
+                toastComponent.ShowError("Không nhận dạng được khuôn mặt. Vui lòng thử lại.");
+            }
+        }
+        else
+        {
+            toastComponent.ShowWarning("Không tìm thấy khuôn mặt trong khung hình.");
+        }
+
+        isProcessing = false;
+    }
+
+    private async Task CancelFaceLogin()
+    {
+        if (module is not null)
+        {
+            await module.InvokeVoidAsync("stopVideo");
+        }
+        isFaceLoginActive = false;
+    }
+
+    private void setCurrentUser(string role, string phone, string name, string address, string password, string id)
     {
         CurrentUser.role = role;
         CurrentUser.phone = phone;
@@ -82,19 +266,17 @@
         CurrentUser.password = password;
         CurrentUser.id = Convert.ToInt16(id);
     }
-    private async Task OnValidSubmit()
+
+    // Đảm bảo tắt camera khi người dùng rời khỏi trang
+    public async ValueTask DisposeAsync()
     {
-        try
+        if (isFaceLoginActive && module is not null)
         {
-            var json = await loginService.LoginAsync(loginModel.Phone, loginModel.Password);
-            if (json == null) { toastComponent.ShowError("Sai tài khoản hoặc mật khẩu"); return; }
-            var user = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, string>>(json)!;
-            setCurrentUser(user["role"], user["phone"], user["name"], user["address"], user["dbPassword"],user["id"]);
-            NavigationManager.NavigateTo(user["role"] == "admin" ? "/home" : "/");
+            await module.InvokeVoidAsync("stopVideo");
         }
-        catch (Exception e)
+        if (module is not null)
         {
-            toastComponent.ShowError(e.Message);
+            await module.DisposeAsync();
         }
     }
 }

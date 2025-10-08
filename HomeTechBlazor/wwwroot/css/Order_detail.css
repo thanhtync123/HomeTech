@@ -1,0 +1,293 @@
+﻿/* ===== BIẾN TOÀN CỤC VÀ KIỂU CƠ BẢN ===== */
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap');
+
+:root {
+    /* Bảng màu */
+    --color-primary-accent: #00ddff;
+    --color-primary-accent-dark: #00a2ff;
+    --color-text-primary: #f0f8ff; /* AliceBlue */
+    --color-text-secondary: #b0c4de; /* LightSteelBlue */
+    --color-danger: #ff4d6d;
+    --color-success: #00f5d4;
+    /* Nền */
+    --bg-main: #0d1117; /* GitHub Dark Dimmed */
+    --bg-card: rgba(31, 41, 55, 0.6);
+    --bg-input: rgba(17, 24, 39, 0.8);
+    --bg-header: rgba(55, 65, 81, 0.7);
+    --bg-hover: rgba(59, 130, 246, 0.1);
+    /* Viền */
+    --border-color: rgba(139, 172, 209, 0.2);
+    --border-focus: var(--color-primary-accent);
+    /* Bo góc và Đổ bóng */
+    --border-radius: 12px;
+    --box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    --focus-shadow: 0 0 0 3px rgba(0, 221, 255, 0.2);
+    /* Chuyển động */
+    --transition-speed: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body {
+    background-color: var(--bg-main);
+    background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,0.05) 1px, transparent 0);
+    background-size: 20px 20px;
+    color: var(--color-text-secondary);
+    font-family: 'Nunito', sans-serif;
+}
+
+/* ===== BỐ CỤC CHÍNH CỦA TRANG ===== */
+.order-detail-page-container {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background: var(--bg-card);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-color);
+    box-shadow: var(--box-shadow);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+}
+
+/* ===== TIÊU ĐỀ (h5) ===== */
+h5 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-text-primary);
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--color-primary-accent);
+    display: inline-block;
+}
+
+/* ===== TRƯỜNG NHẬP LIỆU VÀ FORM ===== */
+.input-group, .mb-2, .mb-3 {
+    margin-bottom: 1.5rem;
+}
+
+.input-group {
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.input-group-text {
+    background: linear-gradient(135deg, var(--color-primary-accent), var(--color-primary-accent-dark));
+    color: var(--bg-main);
+    font-weight: 700;
+    border: none;
+    padding: 0.75rem 1.25rem;
+}
+
+label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--color-text-primary);
+}
+
+.form-control {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background: var(--bg-input);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    color: var(--color-text-primary);
+    font-size: 1rem;
+    transition: all var(--transition-speed);
+}
+
+    .form-control:focus {
+        outline: none;
+        border-color: var(--border-focus);
+        box-shadow: var(--focus-shadow);
+        background: rgba(17, 24, 39, 1);
+    }
+
+    .form-control[readonly] {
+        background-color: rgba(55, 65, 81, 0.5);
+        cursor: not-allowed;
+    }
+
+/* Tùy chỉnh select arrow */
+select.form-control {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%2300ddff' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 1.2em;
+}
+
+/* ===== BẢNG BIỂU (TABLE) ===== */
+.table-responsive {
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    background: var(--bg-input);
+    overflow: hidden; /* che các góc của table bên trong */
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+    .table th, .table td {
+        padding: 1rem;
+        text-align: left;
+        vertical-align: middle;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .table th {
+        background: var(--bg-header);
+        color: var(--color-text-primary);
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 0.8rem;
+        letter-spacing: 0.5px;
+    }
+
+    .table tbody tr {
+        transition: background-color var(--transition-speed);
+    }
+
+.table-hover tbody tr:hover {
+    background-color: var(--bg-hover);
+    cursor: pointer;
+}
+
+.table td p {
+    margin: 0;
+}
+
+/* Tùy chỉnh thanh cuộn */
+.table-responsive::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.table-responsive::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.table-responsive::-webkit-scrollbar-thumb {
+    background: var(--color-primary-accent);
+    border-radius: 4px;
+}
+
+    .table-responsive::-webkit-scrollbar-thumb:hover {
+        background: var(--color-primary-accent-dark);
+    }
+
+
+/* ===== NÚT BẤM (BUTTON) ===== */
+.btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all var(--transition-speed);
+    border: 2px solid transparent;
+    text-transform: uppercase;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--color-primary-accent), var(--color-primary-accent-dark));
+    color: var(--bg-main);
+    box-shadow: 0 4px 15px rgba(0, 221, 255, 0.2);
+}
+
+    .btn-primary:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 7px 20px rgba(0, 221, 255, 0.3);
+    }
+
+    .btn-primary:disabled {
+        background: rgba(55, 65, 81, 0.5);
+        box-shadow: none;
+        cursor: not-allowed;
+        color: var(--color-text-secondary);
+        transform: none;
+    }
+
+.btn-outline-secondary {
+    background: transparent;
+    border-color: var(--border-color);
+    color: var(--color-text-secondary);
+}
+
+    .btn-outline-secondary:hover {
+        background-color: var(--bg-hover);
+        border-color: var(--color-primary-accent);
+        color: var(--color-primary-accent);
+    }
+
+/* Nút thêm/xóa (+) (-) */
+.btn-sm.btn-primary {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    padding: 0;
+    font-size: 1.5rem;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ===== PHẦN TỔNG TIỀN ===== */
+.mt-2 {
+    margin-top: 1.5rem;
+    padding: 1.5rem;
+    background: var(--bg-input);
+    border-radius: var(--border-radius);
+    border-left: 4px solid var(--color-primary-accent);
+}
+
+    .mt-2 strong {
+        display: flex;
+        justify-content: space-between;
+        font-size: 1.1rem;
+        margin-bottom: 0.75rem;
+        color: var(--color-text-secondary);
+    }
+
+        .mt-2 strong:last-child {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--color-primary-accent);
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+    .mt-2 p {
+        margin: 0;
+    }
+
+/* ===== PHÂN TRANG (PAGINATION) ===== */
+p:has(> .btn-outline-secondary) {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+
+/* ===== RESPONSIVE DESIGN ===== */
+@media (max-width: 768px) {
+    .order-detail-page-container {
+        padding: 1rem;
+        margin: 1rem;
+    }
+
+    h5 {
+        font-size: 1.25rem;
+    }
+
+    .table th, .table td {
+        padding: 0.75rem;
+    }
+}

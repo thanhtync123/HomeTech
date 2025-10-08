@@ -79,7 +79,7 @@
     {
         try
         {
-            await userService.RegisterSync(userModel);
+            await userService.RegisterAsync(userModel);
             toastComponent.ShowSuccess("Đăng ký thành công!");
             await Task.Delay(3000);
             NavigationManager.NavigateTo("/login");

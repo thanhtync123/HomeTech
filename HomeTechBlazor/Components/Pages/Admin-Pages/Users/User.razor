@@ -141,7 +141,7 @@
 	{
 		try
 		{
-			await userService.CreateSync(userModel);
+			await userService.CreateAsync(userModel);
 			await LoadData();
 			userModel = new();
 			msg = "";
@@ -170,7 +170,7 @@
 	{
 		try
 		{
-			await userService.UpdateSync(userModel);
+			await userService.UpdateAsync(userModel);
 			await LoadData();
 			userModel = new();
 			msg = "";
@@ -186,7 +186,7 @@
 	{
 		try
 		{
-			await userService.DeleteSync(id);
+			await userService.DeleteAsync(id);
 			await LoadData();
 			userModel = new();
 			msg = "";

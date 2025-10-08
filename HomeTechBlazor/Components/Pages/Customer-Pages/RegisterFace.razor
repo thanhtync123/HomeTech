@@ -1,0 +1,150 @@
+﻿@page "/registerface"
+@rendermode InteractiveServer
+@implements IAsyncDisposable
+@inject IJSRuntime JSRuntime
+@inject UserService userService
+@inject CurrentUser CurrentUser
+@inject NavigationManager NavigationManager
+<HeadContent>
+    <link href="css/registerface.css" rel="stylesheet" />
+</HeadContent>
+<h3>Đăng ký khuôn mặt của bạn</h3>
+<p>Dữ liệu này sẽ được dùng để đăng nhập nhanh trong các lần tiếp theo.</p>
+
+@if (!isCameraStarted)
+{
+    <button class="btn-login" @onclick="StartCamera">Mở Camera</button>
+}
+else
+{
+    <div class="register-face-page">
+        @* <-- THÊM THẺ NÀY *@
+
+        <h3>Đăng ký khuôn mặt của bạn</h3>
+        <p>Dữ liệu này sẽ được dùng để đăng nhập nhanh trong các lần tiếp theo.</p>
+
+        @if (!isCameraStarted)
+        {
+            <button class="btn-primary" @onclick="StartCamera">Mở Camera</button>
+        }
+        else
+        {
+            <div class="face-view-container">
+                <div class="video-container">
+                    <video id="videoRegister" autoplay muted playsinline></video>
+                </div>
+                <button @onclick="CaptureAndSaveFace" class="btn-primary" disabled="@isProcessing">
+                    @if (isProcessing)
+                    {
+                        <span>Đang lưu...</span>
+                    }
+                    else
+                    {
+                        <span>📸 Chụp và Lưu Khuôn Mặt</span>
+                    }
+                </button>
+                <button @onclick="StopCamera" class="btn-secondary">Đóng Camera</button>
+            </div>
+        }
+
+        <Toast @ref="toastComponent" />
+
+    </div>
+}
+
+<Toast @ref="toastComponent" />
+
+@code {
+    // Trường này sẽ được liên kết với thẻ <Toast> ở trên thông qua @ref
+    private Toast toastComponent;
+
+    private IJSObjectReference? module;
+    private bool isCameraStarted = false;
+    private bool isProcessing = false;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            try
+            {
+                module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./js/faceAuth.js");
+                await module.InvokeVoidAsync("loadModels");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Lỗi tải JS module: {ex.Message}");
+                if (toastComponent is not null)
+                {
+                    toastComponent.ShowError("Lỗi tải tài nguyên, vui lòng làm mới trang.");
+                }
+            }
+        }
+    }
+
+    private async Task StartCamera()
+    {
+        isCameraStarted = true;
+        await InvokeAsync(StateHasChanged);
+        await Task.Delay(50);
+        if (module is not null)
+        {
+            var started = await module.InvokeAsync<bool>("startVideo", "videoRegister");
+            if (!started)
+            {
+                toastComponent.ShowError("Không thể truy cập camera. Vui lòng cấp quyền.");
+                isCameraStarted = false;
+            }
+        }
+    }
+
+    private async Task CaptureAndSaveFace()
+    {
+        if (module is null) return;
+        isProcessing = true;
+
+        var descriptor = await module.InvokeAsync<float[]?>("getFaceDescriptor", "videoRegister");
+
+        if (descriptor != null)
+        {
+            var descriptorJson = System.Text.Json.JsonSerializer.Serialize(descriptor);
+            var success = await userService.UpdateFaceDescriptorAsync(CurrentUser.id, descriptorJson);
+
+            if (success)
+            {
+                toastComponent.ShowSuccess("Đăng ký khuôn mặt thành công!");
+                await StopCamera();
+            }
+            else
+            {
+                toastComponent.ShowError("Lưu dữ liệu khuôn mặt thất bại.");
+            }
+        }
+        else
+        {
+            toastComponent.ShowWarning("Không tìm thấy khuôn mặt.");
+        }
+        isProcessing = false;
+    }
+
+    private async Task StopCamera()
+    {
+        if (module is not null)
+        {
+            await module.InvokeVoidAsync("stopVideo");
+        }
+        isCameraStarted = false;
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (isCameraStarted && module is not null)
+        {
+            await module.InvokeVoidAsync("stopVideo");
+        }
+        if (module is not null)
+        {
+            await module.DisposeAsync();
+        }
+    }
+}

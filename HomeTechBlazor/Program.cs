@@ -9,7 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 // === SERVICES ===
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
-
+builder.Services.AddScoped<CurrentUser>(); // SỬA TỪ SINGLETON THÀNH SCOPED
 builder.Services.AddScoped<LoginService>();
 builder.Services.AddScoped<ServiceService>();
 builder.Services.AddScoped<OrderService>();
